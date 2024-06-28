@@ -1,51 +1,45 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+
+* {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
 }
 
-.login-container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 300px;
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+
+  background-color: #6995D1;
+  border-radius: 0 0 1rem 1rem;
 }
 
-.login-container h2 {
-    margin-bottom: 20px;
-    text-align: center;
+.nav > div > a {
+  text-decoration: none;
+  color: black;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.navLeft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 20%;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
+.navRight { 
 
-.form-group input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007BFF;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #0056b3;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  background-color: #CF3A58;
+  height: 2.5rem;
+  padding: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
 }

@@ -27,6 +27,7 @@ with app.app_context():
     
     # Create admin user if it doesn't exist 
     """
+    
     Very temporary solution to creating a admin user for testing purposes DO NOT KEEP THIS FOR TOO LONG 
 
     16:00 - 28/06/2024
@@ -42,7 +43,7 @@ with app.app_context():
 # Define routes
 @app.route('/')
 def hello():
-    return 'Hello, World!'
+    return render_template('index.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -54,10 +55,7 @@ def login():
             login_user(user)
             user.last_login_time = datetime.utcnow()  
             db.session.commit()
-            if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            else:
-                return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Invalid username or email, password, or account not activated')
     return render_template('login.html')

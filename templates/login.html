@@ -23,6 +23,11 @@
     </style>
 </head>
 <body>
+    {% if current_user.is_authenticated %}
+    <script>
+      window.location.href = "{{ url_for('dashboard') }}";
+    </script>
+  {% endif %}
     <div class="form-container login-form active" id="login-form">
         <h2>Login</h2>
         <form method="POST" action="{{ url_for('login') }}">

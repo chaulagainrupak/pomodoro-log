@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro-Log</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="nav">
+        {% if current_user.is_authenticated %}
+        <div class="navLeft">
+            <img src="logo.html" alt="logo">
+        </div>
+
+        <div class="navRight">
+            <a href="/dashboard">Dashboard</a>
+        </div>
+        {% else %}  
+        <div class="navLeft">
+            <img src="logo.html" alt="logo">
+            <a href="/pomodoro"> <h1>Pomodoro</h1> </a>
+            <a href="/about"> <h1>About</h1> </a>
+        </div>
+
+        <div class="navRight">
+            <a href="/login">Login / Signup</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
