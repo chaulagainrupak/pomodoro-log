@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {{ current_user.username }}</h1>
+
+        {% if current_user.role == 'admin' %}
+            <h2>Admin Features</h2>
+            <div>
+                <h3>Accounts Pending Activation</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users_to_activate %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('activate_user', user_id=user.id) }}">
+                                    <button type="submit">Activate</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <br>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</body>
+</html>
