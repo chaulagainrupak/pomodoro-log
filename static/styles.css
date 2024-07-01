@@ -13,9 +13,11 @@
   padding: 1rem;
   padding-left: 2rem;
   padding-right: 2rem;
-
   background-color: #6995D1;
   border-radius: 0 0 1rem 1rem;
+  width: 96vw;
+  position: fixed;
+  z-index: 10;
 }
 
 .nav > div > a {
@@ -43,3 +45,46 @@
   font-size: 1.5rem;
   text-align: center;
 }
+
+
+.content {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f0f0f0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  top: 5rem;
+  position: fixed;
+  height: 100vh;
+}
+
+
+.sections {
+  flex: 1; /* Fill remaining space in the flex container */
+  padding-left: 220px; 
+  overflow-y: auto; /* Allow content to scroll within the sections */
+}
+
+
+.section {
+  margin-top: 10vh;
+  height: 85vh; /* Take full viewport height */
+  padding: 20px;
+}
+
+/* Styling for section links in the sidebar */
+.section-link {
+  display: block;
+  margin-bottom: 10px;
+  color: #333;
+  text-decoration: none;
+}
+
+.section-link:hover {
+  color: #000;
+}
+

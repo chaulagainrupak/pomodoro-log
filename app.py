@@ -2,9 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
+from models import *
 from datetime import datetime
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super secret key man!'
@@ -12,6 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 
 # Initialize SQLAlchemy and LoginManager
 db.init_app(app)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -26,19 +26,20 @@ with app.app_context():
     db.create_all()
     
     # Create admin user if it doesn't exist 
-    """
-    
-    Very temporary solution to creating a admin user for testing purposes DO NOT KEEP THIS FOR TOO LONG 
-
-    16:00 - 28/06/2024
-    
-    """
     admin = User.query.filter_by(username='admin').first()
     if not admin:
         admin_password = generate_password_hash('admin123', method='pbkdf2:sha256')
         admin = User(username='admin', password=admin_password, activate=True, role='admin', email='admin@admin.com')
         db.session.add(admin)
         db.session.commit()
+    
+    # Ensure all users have UsersPreferences
+    users = User.query.all()
+    for user in users:
+        if not UsersPreferences.query.filter_by(user_id=user.id).first():
+            preferences = UsersPreferences(user_id=user.id)
+            db.session.add(preferences)
+    db.session.commit()
 
 # Define routes
 @app.route('/')
@@ -60,8 +61,6 @@ def login():
             flash('Invalid username or email, password, or account not activated')
     return render_template('login.html')
 
-
-
 @app.route('/signup', methods=['POST'])
 def signup():
     if request.method == 'POST':
@@ -76,10 +75,15 @@ def signup():
             new_user = User(username=username, password=hashed_password, activate=False, email=email)
             db.session.add(new_user)
             db.session.commit()
+
+            # Create default user preferences
+            preferences = UserPreferences(user_id=new_user.id)
+            db.session.add(preferences)
+            db.session.commit()
+
             flash('Account created successfully! Please wait for activation.')
             return redirect(url_for('login'))
     return redirect(url_for('login'))
-
 
 @app.route('/logout')
 @login_required
@@ -90,10 +94,9 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    if current_user.role == 'admin':
-        users_to_activate = User.query.filter_by(activate=False).all()
-        return render_template('dashboard.html', current_user=current_user, users_to_activate=users_to_activate)
-    return render_template('dashboard.html', current_user=current_user)
+    preferences = UsersPreferences.query.filter_by(user_id=current_user.id).first()
+    return render_template('dashboard.html', user=current_user, preferences=preferences)
+
 
 
 @app.route('/activate_user/<int:user_id>', methods=['POST'])
@@ -113,6 +116,17 @@ def activate_user(user_id):
 
     return redirect(url_for('dashboard'))
 
+
+
+@app.route('/update/stat', methods=['GET'])
+@login_required
+def stat():
+    print("The current user is:", current_user.username)
+    return redirect(url_for('dashboard'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404 
 
 if __name__ == '__main__':
     app.run(debug=True)
