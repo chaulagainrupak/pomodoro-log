@@ -82,20 +82,43 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
       if (secondsLeft < 0) {
           clearInterval(currentTimerInterval);
           playDingSound();
-          document.getElementById(timeDisplay).textContent = 'Time is up!';
-
-          let resetButton = document.getElementById("resetButton");
-          if (resetButton) {
-              resetButton.innerText = "Start";
-              resetButton.setAttribute("id", "startButton");
-              resetButton.setAttribute("onclick", "startTimer()");
-              resetButton.style.backgroundColor = "";
-          }
+          switchToNextMode();
       } else {
           displayTimeLeft(secondsLeft, timeDisplay);
       }
   }, 1000);
 };
+
+// Function to switch to the next mode
+function switchToNextMode() {
+  const modes = ['Pomodoro', 'Short Break', 'Long Break'];
+  const currentMode = getCurrentMode();
+  const currentIndex = modes.indexOf(currentMode);
+  const nextIndex = (currentIndex + 1) % modes.length;
+  const nextMode = modes[nextIndex];
+
+  // Update the selected mode visually
+  let timerModes = document.querySelector(".timerModes");
+  let modeDivs = timerModes.querySelectorAll("div");
+  modeDivs.forEach((div) => {
+    if (div.textContent.trim() === nextMode) {
+      div.classList.add("selected");
+    } else {
+      div.classList.remove("selected");
+    }
+  });
+
+  const startButton = document.getElementById("resetButton") || document.getElementById("startButton");
+  if (startButton) {
+      startButton.innerText = "Start";
+      startButton.setAttribute("id", "startButton");
+      startButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
+      startButton.style.backgroundColor = "";
+  }
+  
+  updateTime(nextMode);
+  startTimer(pomodoroDuration, shortBreakDuration, longBreakDuration);
+}
 
 // Function to reset the timer
 let resetTimer = () => {
@@ -215,6 +238,7 @@ let changeMode = () => {
       });
   });
 };
+
 let getCurrentMode = () => {
   let timerModes = document.querySelector(".timerModes");
   let selectedMode = timerModes.querySelector("div.selected");
