@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
     <title>Pomodoro-Log</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
@@ -18,7 +19,7 @@
     <div class="nav">
         {% if current_user.is_authenticated %}
         <div class="navLeft">
-            <img src="logo.html" alt="logo">
+            <img src="../static/favicon.ico" alt="logo">
         </div>
 
         <div class="navRight">
@@ -26,7 +27,7 @@
         </div>
         {% else %}
         <div class="navLeft">
-            <img src="logo.html" alt="logo">
+            <img src="../static/favicon.ico" alt="logo">
             <a href="/pomodoro"> <h1>Pomodoro</h1> </a>
             <a href="/about"> <h1>About</h1> </a>
         </div>
@@ -55,12 +56,11 @@
                     <div id="timer">
                         <div id="time">{{ preferences.pomodoro_duration }}:00</div>
                         <label>
-                            Auto Start Timer:
-                            <input type="checkbox" id="autoStartCheckbox" {% if preferences.auto_start %}checked{% endif %}>
+                            Auto Start Breaks:
+                            <input type="checkbox" id="autoStartCheckbox">
                         </label>
                         <div id="timer-mode" class="timer-mode">Pomodoro Mode</div>
-                        <button id="startButton" onclick="startTimer({{ preferences.pomodoro_duration }})">Start</button>
-                        <button id="resetButton" onclick="resetTimer()" style="display: none;">Reset</button>
+                        <button id="startButton" onclick="startTimer({{ preferences.pomodoro_duration }}, {{ preferences.short_break_duration }}, {{ preferences.long_break_duration }})">Start</button>
                     </div>
                 </div>
     
