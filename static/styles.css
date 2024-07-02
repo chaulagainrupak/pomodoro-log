@@ -60,6 +60,7 @@ body {
 
 .navLeft img {
   height: 3rem;
+  margin-right: 2rem;
 }
 .navLeft a:hover {
   color: var(--accent-blue);

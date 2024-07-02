@@ -26,7 +26,6 @@ class UsersPreferences(db.Model):
     pomodoro_duration = db.Column(db.Integer, default=25)  # Pomodoro duration in minutes
     short_break_duration = db.Column(db.Integer, default=5)  # Short break duration in minutes
     long_break_duration = db.Column(db.Integer, default=15)  # Long break duration in minutes
-    auto_start = db.Column(db.Boolean, default=False)
     
     user = db.relationship('User', backref=db.backref('preferences', lazy=True))
 
