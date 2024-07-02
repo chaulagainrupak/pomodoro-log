@@ -1,5 +1,6 @@
 let currentTimerInterval;
 let pomodoroDuration, shortBreakDuration, longBreakDuration;
+let pomodoroCount = 0;
 
 // Function to initialize the timer with durations
 function initializeTimer() {
@@ -91,11 +92,19 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
 
 // Function to switch to the next mode
 function switchToNextMode() {
-  const modes = ['Pomodoro', 'Short Break', 'Long Break'];
   const currentMode = getCurrentMode();
-  const currentIndex = modes.indexOf(currentMode);
-  const nextIndex = (currentIndex + 1) % modes.length;
-  const nextMode = modes[nextIndex];
+  let nextMode;
+
+  if (currentMode === 'Pomodoro') {
+    pomodoroCount++;
+    if (pomodoroCount % 4 === 0) {
+      nextMode = 'Long Break';
+    } else {
+      nextMode = 'Short Break';
+    }
+  } else {
+    nextMode = 'Pomodoro';
+  }
 
   // Update the selected mode visually
   let timerModes = document.querySelector(".timerModes");
@@ -110,10 +119,10 @@ function switchToNextMode() {
 
   const startButton = document.getElementById("resetButton") || document.getElementById("startButton");
   if (startButton) {
-      startButton.innerText = "Start";
-      startButton.setAttribute("id", "startButton");
-      startButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
-      startButton.style.backgroundColor = "";
+    startButton.innerText = "Start";
+    startButton.setAttribute("id", "startButton");
+    startButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
+    startButton.style.backgroundColor = "";
   }
   
   updateTime(nextMode);
@@ -123,36 +132,39 @@ function switchToNextMode() {
 // Function to reset the timer
 let resetTimer = () => {
   if (currentTimerInterval) {
-      clearInterval(currentTimerInterval);
+    clearInterval(currentTimerInterval);
   }
   const resetButton = document.getElementById("resetButton");
   if (resetButton) {
-      resetButton.innerText = "Start";
-      resetButton.setAttribute("id", "startButton");
-      resetButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
-      resetButton.style.backgroundColor = "";
+    resetButton.innerText = "Start";
+    resetButton.setAttribute("id", "startButton");
+    resetButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
+    resetButton.style.backgroundColor = "";
   }
+  
+  pomodoroCount = 0;  // Reset the Pomodoro count
   
   // Set the time display to the default value for the current mode
   const currentMode = getCurrentMode();
   let defaultDuration;
   let timeDisplay;
   switch (currentMode) {
-      case 'Pomodoro':
-          defaultDuration = pomodoroDuration;
-          timeDisplay = 'pomodoroTime';
-          break;
-      case 'Short Break':
-          defaultDuration = shortBreakDuration;
-          timeDisplay = 'shortBreakTime';
-          break;
-      case 'Long Break':
-          defaultDuration = longBreakDuration;
-          timeDisplay = 'longBreakTime';
-          break;
+    case 'Pomodoro':
+      defaultDuration = pomodoroDuration;
+      timeDisplay = 'pomodoroTime';
+      break;
+    case 'Short Break':
+      defaultDuration = shortBreakDuration;
+      timeDisplay = 'shortBreakTime';
+      break;
+    case 'Long Break':
+      defaultDuration = longBreakDuration;
+      timeDisplay = 'longBreakTime';
+      break;
   }
   displayTimeLeft(defaultDuration * 60, timeDisplay);
 };
+
 
 // Function to display time left in timer
 function displayTimeLeft(seconds, timeDisplayId) {
@@ -198,44 +210,46 @@ let changeMode = () => {
   let modeDivs = timerModes.querySelectorAll("div");
 
   modeDivs.forEach((div) => {
-      div.addEventListener("click", () => {
-          modeDivs.forEach((d) => d.classList.remove("selected"));
-          div.classList.add("selected");
+    div.addEventListener("click", () => {
+      modeDivs.forEach((d) => d.classList.remove("selected"));
+      div.classList.add("selected");
 
-          let mode = div.textContent.trim();
-          updateTime(mode);
+      let mode = div.textContent.trim();
+      updateTime(mode);
 
-          if (currentTimerInterval) {
-              clearInterval(currentTimerInterval);
-          }
+      if (currentTimerInterval) {
+        clearInterval(currentTimerInterval);
+      }
 
-          const startButton = document.getElementById("resetButton") || document.getElementById("startButton");
-          if (startButton) {
-              startButton.innerText = "Start";
-              startButton.setAttribute("id", "startButton");
-              startButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
-              startButton.style.backgroundColor = "";
-          }
+      pomodoroCount = 0;  // Reset the Pomodoro count when manually changing modes
 
-          // Set the time display to the default value for the new mode
-          let defaultDuration;
-          let timeDisplay;
-          switch (mode) {
-              case 'Pomodoro':
-                  defaultDuration = pomodoroDuration;
-                  timeDisplay = 'pomodoroTime';
-                  break;
-              case 'Short Break':
-                  defaultDuration = shortBreakDuration;
-                  timeDisplay = 'shortBreakTime';
-                  break;
-              case 'Long Break':
-                  defaultDuration = longBreakDuration;
-                  timeDisplay = 'longBreakTime';
-                  break;
-          }
-          displayTimeLeft(defaultDuration * 60, timeDisplay);
-      });
+      const startButton = document.getElementById("resetButton") || document.getElementById("startButton");
+      if (startButton) {
+        startButton.innerText = "Start";
+        startButton.setAttribute("id", "startButton");
+        startButton.setAttribute("onclick", `startTimer(${pomodoroDuration}, ${shortBreakDuration}, ${longBreakDuration})`);
+        startButton.style.backgroundColor = "";
+      }
+
+      // Set the time display to the default value for the new mode
+      let defaultDuration;
+      let timeDisplay;
+      switch (mode) {
+        case 'Pomodoro':
+          defaultDuration = pomodoroDuration;
+          timeDisplay = 'pomodoroTime';
+          break;
+        case 'Short Break':
+          defaultDuration = shortBreakDuration;
+          timeDisplay = 'shortBreakTime';
+          break;
+        case 'Long Break':
+          defaultDuration = longBreakDuration;
+          timeDisplay = 'longBreakTime';
+          break;
+      }
+      displayTimeLeft(defaultDuration * 60, timeDisplay);
+    });
   });
 };
 
