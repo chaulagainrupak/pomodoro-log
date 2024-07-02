@@ -54,12 +54,16 @@
                 <div id="pomodoro" class="section">
                     <h2>Pomodoro Timer</h2>
                     <div id="timer">
-                        <div id="time">{{ preferences.pomodoro_duration }}:00</div>
-                        <label>
-                            Auto Start Breaks:
-                            <input type="checkbox" id="autoStartCheckbox">
-                        </label>
-                        <div id="timer-mode" class="timer-mode">Pomodoro Mode</div>
+                        <div id="pomodoroTime" class="time">{{ preferences.pomodoro_duration }}:00</div>
+                        <div id="shortBreakTime" class="time hidden">{{ preferences.short_break_duration }}:00</div>
+                        <div id="longBreakTime" class="time hidden">{{ preferences.long_break_duration }}:00</div>
+                        <!-- <div id="timer-mode" class="timer-mode">Pomodoro Mode</div> -->
+
+                        <div class="timerModes">
+                            <div class="timerModePomodoro selected" onclick="updateTime('Pomodoro')">Pomodoro</div>
+                            <div class="timerModeShortBreak" onclick="updateTime('Short Break')">Short Break</div>
+                            <div class="timerModeLongBreak" onclick="updateTime('Long Break')">Long Break</div>
+                        </div>
                         <button id="startButton" onclick="startTimer({{ preferences.pomodoro_duration }}, {{ preferences.short_break_duration }}, {{ preferences.long_break_duration }})">Start</button>
                     </div>
                 </div>

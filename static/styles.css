@@ -126,6 +126,9 @@ body {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+.section > h2 {
+  font-size: 2rem;
+}
 
 /* Additional styles for the timer */
 #timer {
@@ -133,24 +136,50 @@ body {
   margin-top: 20px;
 }
 
-#time {
-  font-size: 3rem;
+.time {
+  font-size: 4rem;
   font-weight: bold;
   color: var(--primary-green);
 }
 
-button, #startButton, #resetButton {
+#startButton, #resetButton {
   background-color: var(--primary-green);
   color: var(--text-light);
   border: none;
   padding: 10px 20px;
-  margin: 10px;
+  margin: 2rem;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-size: 2rem;
 }
 
-button:hover {
+#startButton:hover, #resetButton:hover {
   background-color: var(--secondary-green);
 }
 
+
+.timerModes {
+  margin-top: 1rem;
+  font-size: 3rem;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.timerModes > div.selected{
+  border-radius: 20px;;
+  background-color: var(--primary-green);
+  color: var(--text-light);
+  padding: 1rem;
+}
+
+.timerModes > div{
+  border-radius: 20px;
+  border: var(--primary-green) 2px solid;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
