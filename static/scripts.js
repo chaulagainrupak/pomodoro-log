@@ -1,15 +1,14 @@
-
 // Function to toggle between login and signup forms
 function toggleForm(form) {
-  const loginForm = document.getElementById('login-form');
-  const signupForm = document.getElementById('signup-form');
+  const loginForm = document.getElementById("login-form");
+  const signupForm = document.getElementById("signup-form");
 
-  if (form === 'login') {
-      loginForm.classList.add('active');
-      signupForm.classList.remove('active');
-  } else if (form === 'signup') {
-      loginForm.classList.remove('active');
-      signupForm.classList.add('active');
+  if (form === "login") {
+    loginForm.classList.add("active");
+    signupForm.classList.remove("active");
+  } else if (form === "signup") {
+    loginForm.classList.remove("active");
+    signupForm.classList.add("active");
   }
 }
 
@@ -22,7 +21,7 @@ function toggleForm(form) {
 // // Function to start the timer with given duration
 // function startTimer(pomodoroDuration, shortBreakDuration, longBreakDuration) {
 //     let duration;
-
+// This can be ignored
 //     switch (currentPhase) {
 //         case 'work':
 //             duration = pomodoroDuration;
@@ -42,7 +41,6 @@ function toggleForm(form) {
 //     }
 
 //     duration *= 60;  // Convert to seconds
-
 
 //     const startTime = Date.now();
 //     const endTime = startTime + (duration * 1000);
@@ -108,64 +106,67 @@ function toggleForm(form) {
 //     }
 // }
 let startTimer = (pomodoroDuration, shortBreakDuration, longBreakDuration) => {
-    const startButton = document.getElementById('startButton');
-    startButton.innerText = 'Reset';
-    startButton.setAttribute("id", "resetButton");
-    startButton.setAttribute("onclick", "resetTimer()");
-    startButton.style.backgroundColor = '#EE3940';
-}
+  const startButton = document.getElementById("startButton");
+  startButton.innerText = "Reset";
+  startButton.setAttribute("id", "resetButton");
+  startButton.setAttribute("onclick", "resetTimer()");
+  startButton.style.backgroundColor = "#EE3940";
+};
 
 // Function to reset the timer
-  let  resetTimer =  () => {
-      location.reload()
+let resetTimer = () => {
+  location.reload();
+};
+
+let updateTime = (mode) => {
+  let time;
+
+  switch (mode) {
+    case "Pomodoro":
+      time = document.getElementById("pomodoroTime");
+      time.classList.remove("hidden");
+      document.getElementById("shortBreakTime").classList.add("hidden");
+      document.getElementById("longBreakTime").classList.add("hidden");
+      break;
+
+    case "Short Break":
+      time = document.getElementById("shortBreakTime");
+      time.classList.remove("hidden");
+      document.getElementById("pomodoroTime").classList.add("hidden");
+      document.getElementById("longBreakTime").classList.add("hidden");
+      break;
+
+    case "Long Break":
+      time = document.getElementById("longBreakTime");
+      time.classList.remove("hidden");
+      document.getElementById("pomodoroTime").classList.add("hidden");
+      document.getElementById("shortBreakTime").classList.add("hidden");
+      break;
+
+    default:
+      break;
   }
+};
 
-
+let changeMode = () => {
   //This code allows you to change the timer modes in the pomodoro timer
   let timerModes = document.querySelector(".timerModes");
+  let modeDivs = timerModes.querySelectorAll("div");
 
-  // Select all div elements inside .timerModes
-  let modeDivs = timerModes.querySelectorAll('div');
-  
-  modeDivs.forEach(div => {
-      div.addEventListener('click', () => {
-          // Remove 'selected' class from all modeDivs
-          modeDivs.forEach(d => {
-              d.classList.remove('selected');
-          });
-  
-          // Add 'selected' class to the clicked div
-          div.classList.add('selected');
+  modeDivs.forEach((div) => {
+    div.addEventListener("click", () => {
+      modeDivs.forEach((d) => {
+        d.classList.remove("selected");
       });
+
+      // Add 'selected' class to the clicked div
+      div.classList.add("selected");
+      //   temporary debugging thing
+      //   console.log(div.getAttribute("class"));
+    });
   });
-  
-
-  let updateTime = (mode) => {
-    let time;
-
-    switch (mode) {
-        case 'Pomodoro':
-            time = document.getElementById('pomodoroTime');
-            time.classList.remove('hidden');
-            document.getElementById('shortBreakTime').classList.add('hidden');
-            document.getElementById('longBreakTime').classList.add('hidden');
-            break;
-
-        case 'Short Break':
-            time = document.getElementById('shortBreakTime');
-            time.classList.remove('hidden');
-            document.getElementById('pomodoroTime').classList.add('hidden');
-            document.getElementById('longBreakTime').classList.add('hidden');
-            break;
-
-        case 'Long Break':
-            time = document.getElementById('longBreakTime');
-            time.classList.remove('hidden');
-            document.getElementById('pomodoroTime').classList.add('hidden');
-            document.getElementById('shortBreakTime').classList.add('hidden');
-            break;
-
-        default:
-            break;
-    }
 };
+
+document.addEventListener("DOMContentLoaded", function () {
+  changeMode();
+});
