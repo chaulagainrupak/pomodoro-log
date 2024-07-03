@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
+    <title>Pomodoro-Log Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='settings.css') }}">
+
+</head>
+<body>
+    <div class="nav">
+        <div class="navLeft">
+            <img src="../static/favicon.ico" alt="logo">
+        </div>
+        <div class="navRight">
+            <a href="/dashboard">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="sidebar">
+            <div class="sidebarTop">
+                <a href="#general" class="section-link">🔧 General</a>
+                <a href="#notifications" class="section-link">🔔 Notifications</a>
+                <a href="#security" class="section-link">🔒 Security</a>
+            </div>
+            <div class="sidebarBottom">
+                <a href="/logout" class="section-link">🚪 Logout</a>
+            </div>
+        </div>
+
+        <div class="sections">
+            <div id="general" class="section">
+                <h2>General Settings</h2>
+                <p>Update your general preferences here.</p>
+                <form method="POST">
+                    <label for="pomodoro_duration">Pomodoro Duration (minutes):</label>
+                    <input type="number" id="pomodoro_duration" name="pomodoro_duration" value="{{ preferences.pomodoro_duration }}">
+                    <label for="short_break_duration">Short Break Duration (minutes):</label>
+                    <input type="number" id="short_break_duration" name="short_break_duration" value="{{ preferences.short_break_duration }}">
+                    <label for="long_break_duration">Long Break Duration (minutes):</label>
+                    <input type="number" id="long_break_duration" name="long_break_duration" value="{{ preferences.long_break_duration }}">
+                    <button type="submit" name="update_duration">Update Duration</button>
+                </form>
+            </div>
+            <div id="notifications" class="section">
+                <h2>Notification Settings</h2>
+                <p>Manage your notification preferences.<br>
+                There are no notification settings just yet!
+                </p>
+            </div>
+            <div id="security" class="section">
+                <h2>Security Settings</h2>
+                <p>Change your email address and password here.</p>
+                <form method="POST">
+                    <label for="new-email">New Email:</label><br>
+                    <input type="email" id="new-email" name="new_email"><br>
+                    <button type="submit" name="change_email">Change Email</button>
+                </form>
+                <form method="POST">
+                    <label for="current-password">Current Password:</label><br>
+                    <input type="password" id="current-password" name="current_password"><br>
+                    <label for="new-password">New Password:</label><br>
+                    <input type="password" id="new-password" name="new_password"><br>
+                    <button type="submit" name="change_password">Change Password</button>
+                </form>
+                <form method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+                    <button type="submit" name="delete_account" class="deleteButton">Delete Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div id="flash-container">    
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    </div>
+
+
+    </div>
+
+    <script>
+            setTimeout(() => {
+            const flashMessages = document.querySelectorAll('.flash-messages');
+            flashMessages.forEach(message => {
+                message.style.display = 'none';
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

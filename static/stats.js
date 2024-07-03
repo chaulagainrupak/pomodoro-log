@@ -57,9 +57,15 @@ function displayFunStats(funStats, timeRange) {
             <li>- Could have read ${funStats.books_read} books</li>
             <li>- Could have watched ${funStats.movies_watched} movies</li>
             <li>- Could have run ${funStats.marathons_run} marathons</li>
+            <li>- Could have read ${funStats.articles_read} articles</li>
+            <li>- Could have written ${funStats.blog_posts_written} blog posts</li>
+            <li>- Could have listened to ${funStats.songs_listened} songs</li>
+            <li>- Could have listened to ${funStats.podcasts_listened} podcasts</li>
+            <li>- Could have taken ${funStats.naps_taken} naps</li>
         </ul>
     `;
 }
+
 
 function formatDuration(value, unit) {
     if (value < 1000) {

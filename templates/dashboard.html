@@ -46,6 +46,9 @@
             {% if current_user.is_authenticated %}
                 <a href="#pomodoro" class="section-link">🍅 Pomodoro</a>
                 <a href="#statistics" class="section-link">📊 Statistics</a>
+                <a href="#todo" class="section-link disabled" title="Coming Soon!" data-tippy-content="Coming Soon!">📋 To-Do (Soon!)</a>
+                <a href="#notes" class="section-link disabled" title="Coming Soon!" data-tippy-content="Coming Soon!">📝 Notes (Soon!)</a>
+                <a href="#flashcards" class="section-link disabled" title="Coming Soon!" data-tippy-content="Coming Soon!">🗂 Flash-Cards (Soon!)</a>
             {% else %}
                 <a href="/login">Login</a>
                 <a href="/signup">Signup</a>
@@ -64,13 +67,14 @@
             <div class="sections">
                 <div id="pomodoro" class="section">
                     <h2>Pomodoro Timer</h2>
+                    (click the timer to change duration)
                     <div id="timer">
                         <div class="clock-container">
                             <div class="clock-face">
                             </div>
-                            <div id="pomodoroTime" class="time">25:00</div>
-                            <div id="shortBreakTime" class="time hidden">05:00</div>
-                            <div id="longBreakTime" class="time hidden">15:00</div>
+                            <div id="pomodoroTime" class="time">{{preferences.pomodoro_duration}}:00</div>
+                            <div id="shortBreakTime" class="time hidden">{{preferences.short_break_duration}}:00</div>
+                            <div id="longBreakTime" class="time hidden">{{preferences.long_break_duration}}:00</div>
                         </div>
                         <div class="timerModes">
                             <div class="timerModePomodoro selected" onclick="updateTime('Pomodoro')">Pomodoro</div>

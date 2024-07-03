@@ -287,6 +287,19 @@ let getCurrentMode = () => {
 
 // Add event listener to DOMContentLoaded to initialize mode change functionality
 document.addEventListener("DOMContentLoaded", function () {
+  
+let times = document.querySelectorAll('.time');
+  
+  times.forEach(time => {
+    time.addEventListener('click', settings);
+  });
   changeMode();
   initializeTimer();
 });
+
+
+
+
+let settings = () => {
+  window.location.href = 'http://0.0.0.0:5000/settings';
+}

@@ -1,0 +1,126 @@
+:root {
+    --primary-green: #00b300;
+    --secondary-green: #008000;
+    --accent-blue: #1e90ff;
+    --background-white: #f0f8ff;
+    --text-dark: #333333;
+    --text-light: #ffffff;
+    --reset-button: #EE3940;
+}
+
+button {
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: var(--secondary-green);
+}
+
+label {
+    font-size: 1.5rem;
+    margin-bottom: 5px !important;
+    margin-top: 5px !important;
+    color: var(--text-dark);
+}
+
+input {
+    width: calc(100% - 32px); /* Adjusted width to accommodate the eye icon */
+    padding: 10px;
+    border: 1px solid var(--primary-green);
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.deleteButton {
+    background-color: var(--reset-button) !important;
+}
+
+/* Flash messages */
+#flash-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.flash-message {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+    opacity: 0.9;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.flash-message.success {
+    background-color: var(--accent-blue);
+}
+
+.flash-message.error {
+    background-color: var(--reset-button);
+}
+
+/* Form styling */
+.section form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.section label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.section input[type="number"],
+.section input[type="email"],
+.section input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.section button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-green);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.section button:hover {
+    background-color: var(--secondary-green);
+}
+
+.section .deleteButton {
+    background-color: var(--reset-button);
+    margin-top: 20px;
+}
+
+.section .deleteButton:hover {
+    background-color: #d32f2f;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section form {
+        max-width: 100%;
+    }
+}

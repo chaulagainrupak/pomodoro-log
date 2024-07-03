@@ -125,6 +125,7 @@ def signup():
 @login_required
 def logout():
     logout_user()
+    return redirect('/')
 
 @app.route('/dashboard')
 @login_required
@@ -220,8 +221,14 @@ def update_session():
 
         phase = data['phase']
 
-        current_session = CurrentSession.query.filter_by(user_id=current_user.id).order_by(CurrentSession.start_time.desc()).first()
+        current_session = CurrentSession.query.filter_by(user_id=current_user.id, ended=False).order_by(CurrentSession.start_time.desc()).first()
         user_preference = UsersPreferences.query.filter_by(user_id=current_user.id).first()
+
+        if not current_session:
+            return jsonify({"error": "No active session found, This is nothing to worry about!"}), 201
+
+        if end_time < current_session.start_time:
+            return jsonify({"error": "End time cannot be earlier than start time"}), 400
 
         if phase == 'Pomodoro':
             allowed_time = user_preference.pomodoro_duration
@@ -229,23 +236,12 @@ def update_session():
             allowed_time = user_preference.short_break_duration
         else:
             allowed_time = user_preference.long_break_duration
-        
-        print(allowed_time)
-        print(current_session)
-        if not current_session or current_session.ended == '1':
-            return jsonify({"error": "No active session found, This is nothing to worry about!"}), 201
-        elif time.time() > end_time:
-            print('Old DB does\'nt need updating')
 
-        if end_time < int(current_session.start_time):
-            return jsonify({"error": "End time cannot be earlier than start time"}), 400
-
-        if (end_time - time.time()) > allowed_time * 60:
+        if end_time - current_session.start_time > allowed_time * 60:
             return jsonify({"error": "End time cannot be greater than what is defined"}), 400
 
-
-        current_session.end_time = end_time
         current_session.ended = True
+        current_session.end_time = end_time
         db.session.commit()
 
         # Calculate the time difference for logging purposes
@@ -258,6 +254,7 @@ def update_session():
         return jsonify({"error": str(e)}), 400
 
 
+
 from datetime import date
 
 @app.route('/moveCompletedSessions', methods=['POST'])
@@ -265,8 +262,10 @@ def move_completed_sessions():
     try:
         # Fetch all ended sessions for the current user
         ended_sessions = CurrentSession.query.filter_by(ended=True).all()
-
+        non_ended_sessions = CurrentSession.query.filter_by(ended=False).all()
         moved_count = 0
+        deleted_count = 0
+        non_completed_count = 0
         for session in ended_sessions:
             # Create a new CompletedSession
             completed_session = CompletedSession(
@@ -279,18 +278,74 @@ def move_completed_sessions():
                 completed=True
             )
             db.session.add(completed_session)
-            
             # Delete the session from CurrentSession
             db.session.delete(session)
             
             moved_count += 1
+            deleted_count += 1
+
+        for session in non_ended_sessions:
+            non_completed_count += 1
+            db.session.delete(session)
+            deleted_count += 1
 
         db.session.commit()
-        return jsonify({"message": f"Moved {moved_count} sessions to CompletedSession"}), 200
+        return jsonify({
+            "message": f"Moved {moved_count} completed sessions to CompletedSession and deleted {deleted_count} non-completed sessions",
+            "non_completed_count": non_completed_count
+        }), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
+
+
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    preferences = UsersPreferences.query.filter_by(user_id=current_user.id).first()
+    
+    if request.method == 'POST':
+        if 'update_duration' in request.form:
+            # Update duration settings
+            preferences.pomodoro_duration = int(request.form['pomodoro_duration'])
+            preferences.short_break_duration = int(request.form['short_break_duration'])
+            preferences.long_break_duration = int(request.form['long_break_duration'])
+            db.session.commit()
+            flash('Duration settings updated successfully', 'success')
+
+        elif 'change_email' in request.form:
+            # Change email
+            new_email = request.form['new_email']
+            if User.query.filter_by(email=new_email).first():
+                flash('Email already in use', 'error')
+            else:
+                current_user.email = new_email
+                db.session.commit()
+                flash('Email updated successfully', 'success')
+
+        elif 'change_password' in request.form:
+            # Change password
+            current_password = request.form['current_password']
+            new_password = request.form['new_password']
+            if check_password_hash(current_user.password, current_password):
+                current_user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+                db.session.commit()
+                flash('Password changed successfully', 'success')
+            else:
+                flash('Current password is incorrect', 'error')
+
+        elif 'delete_account' in request.form:
+            # Delete account
+            db.session.delete(current_user)
+            db.session.commit()
+            flash('Your account has been deleted', 'success')
+            return redirect(url_for('logout'))
+
+        return redirect(url_for('settings'))
+
+    return render_template('settings.html', user=current_user, preferences=preferences)
 
 
 @app.route('/user_statistics')
@@ -351,12 +406,18 @@ def user_statistics():
 
     # Calculate the fun stats
 
+    # Calculate the fun stats
     total_hours = total_duration / 3600
     total_minutes = total_duration / 60
     total_seconds = total_duration
     books_read = total_hours / 5  # Assuming 5 hours to read a book
     movies_watched = total_hours / 2  # Assuming 2 hours to watch a movie
     marathons_run = total_hours / 4  # Assuming 4 hours to run a marathon
+    articles_read = total_hours / 1  # Assuming 1 hour to read an article
+    blog_posts_written = total_hours / 2  # Assuming 2 hours to write a blog post
+    songs_listened = total_hours * 20  # Assuming 20 minutes to listen to a song
+    podcasts_listened = total_hours / 1.5  # Assuming 1.5 hours to listen to a podcast
+    naps_taken = total_hours / 0.5  # Assuming 0.5 hours to take a nap
 
     chart_data = {
         'labels': ['Work', 'Short Break', 'Long Break'],
@@ -386,8 +447,13 @@ def user_statistics():
         'long_breaks': long_breaks,
         'books_read': round(books_read, 2),
         'movies_watched': round(movies_watched, 2),
-        'marathons_run': round(marathons_run, 2)
-    }
+        'marathons_run': round(marathons_run, 2),
+        'articles_read': round(articles_read, 2),
+        'blog_posts_written': round(blog_posts_written, 2),
+        'songs_listened': round(songs_listened, 0),
+        'podcasts_listened': round(podcasts_listened, 2),
+        'naps_taken': round(naps_taken, 2)
+        }
 
     return jsonify({'chart_data': chart_data, 'fun_stats': fun_stats, 'time_range': time_range})
 
