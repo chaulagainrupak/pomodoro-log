@@ -1,3 +1,13 @@
+"""
+
+I am really sorry for the person helping me contribute to this project, I too have to clue as to what i am doing here, 
+The AI comments here are not too helpful. 
+
+🙏 I am sorry again, even to my future self.
+
+"""
+
+
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -28,6 +38,10 @@ with app.app_context():
     db.create_all()
     
     # Create admin user if it doesn't exist 
+
+    """
+    This is really temporary please remove this from the production code this shit will make you really vulnerable 
+    """
     admin = User.query.filter_by(username='admin').first()
     if not admin:
         admin_password = generate_password_hash('admin123', method='pbkdf2:sha256')
@@ -252,9 +266,7 @@ def move_completed_sessions():
 
 
 @app.route('/user_statistics')
-
 @login_required
-
 def user_statistics():
 
     time_range = request.args.get('range')
@@ -285,11 +297,8 @@ def user_statistics():
     # Initialize variables to store the total duration and counts
 
     total_duration = 0
-
     work_sessions = 0
-
     short_breaks = 0
-
     long_breaks = 0
 
 
@@ -315,15 +324,10 @@ def user_statistics():
     # Calculate the fun stats
 
     total_hours = total_duration / 3600
-
     total_minutes = total_duration / 60
-
     total_seconds = total_duration
-
     books_read = total_hours / 5  # Assuming 5 hours to read a book
-
     movies_watched = total_hours / 2  # Assuming 2 hours to watch a movie
-
     marathons_run = total_hours / 4  # Assuming 4 hours to run a marathon
 
     chart_data = {
@@ -346,25 +350,15 @@ def user_statistics():
     }
 
     fun_stats = {
-
         'total_hours': round(total_hours, 2),
-
         'total_minutes': round(total_minutes, 2),
-
         'total_seconds': round(total_seconds, 0),
-
         'work_sessions': work_sessions,
-
         'short_breaks': short_breaks,
-
         'long_breaks': long_breaks,
-
         'books_read': round(books_read, 2),
-
         'movies_watched': round(movies_watched, 2),
-
         'marathons_run': round(marathons_run, 2)
-
     }
 
     return jsonify({'chart_data': chart_data, 'fun_stats': fun_stats, 'time_range': time_range})

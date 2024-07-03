@@ -51,7 +51,7 @@ function displayFunStats(funStats, timeRange) {
         <h3>Fun Facts</h3>
         <p>In the past ${timeRange}, you:</p>
         <ul>
-            <li>- Studied for ${formatDuration(funStats.total_hours, 'hour')} [In Minutes: ${formatDuration(funStats.total_minutes, 'minute')}, In Seconds: ${formatDuration(funStats.total_seconds, 'second')}]</li>
+            <li>- Studied for ${formatDuration(funStats.total_hours, 'hour')} [In Minutes: ${formatDuration(funStats.total_minutes, 'minute')},<br> In Seconds: ${formatDuration(funStats.total_seconds, 'second')}]</li>
             <li>- Completed ${funStats.work_sessions} work sessions [Total Sessions: ${funStats.work_sessions + funStats.short_breaks + funStats.long_breaks}]</li>
             <li>- Took ${funStats.short_breaks} short breaks and ${funStats.long_breaks} long breaks</li>
             <li>- Could have read ${funStats.books_read} books</li>
