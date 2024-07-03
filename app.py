@@ -44,12 +44,12 @@ with app.app_context():
     """
     This is really temporary please remove this from the production code this shit will make you really vulnerable 
     """
-    admin = User.query.filter_by(username='admin').first()
-    if not admin:
-        admin_password = generate_password_hash('admin123', method='pbkdf2:sha256')
-        admin = User(username='admin', password=admin_password, activate=True, role='admin', email='admin@admin.com')
-        db.session.add(admin)
-        db.session.commit()
+    # admin = User.query.filter_by(username='admin').first()
+    # if not admin:
+    #     admin_password = generate_password_hash('admin123', method='pbkdf2:sha256')
+    #     admin = User(username='admin', password=admin_password, activate=True, role='admin', email='admin@admin.com')
+    #     db.session.add(admin)
+    #     db.session.commit()
     
     # Ensure all users have UsersPreferences
     users = User.query.all()
@@ -103,7 +103,17 @@ def signup():
                 flash('Email already exists!', 'error')
             else:
                 hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-                new_user = User(username=username, password=hashed_password, activate=False, email=email)
+                
+                # Check if this is the first user
+                is_first_user = User.query.count() == 0
+                
+                new_user = User(
+                    username=username, 
+                    password=hashed_password, 
+                    activate=is_first_user,  # Activate if it's the first user
+                    email=email,
+                    role='admin' if is_first_user else 'user'  # Set as admin if it's the first user
+                )
                 db.session.add(new_user)
                 db.session.commit()
 
@@ -112,7 +122,10 @@ def signup():
                 db.session.add(preferences)
                 db.session.commit()
 
-                flash('Account created successfully! Please wait for activation.', 'success')
+                if is_first_user:
+                    flash('Account created successfully! You are the first user and have been set as an admin.', 'success')
+                else:
+                    flash('Account created successfully! Please wait for activation.', 'success')
                 return redirect(url_for('login'))
         except Exception as e:
             print(e)
