@@ -48,6 +48,9 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
   if (!startButton) return;
 
   const currentMode = getCurrentMode();
+
+  createCurrentSession();
+
   let duration;
   let timeDisplay;
   switch (currentMode) {
@@ -93,6 +96,7 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
 // Function to switch to the next mode
 function switchToNextMode() {
   const currentMode = getCurrentMode();
+  
   let nextMode;
 
   if (currentMode === 'Pomodoro') {
@@ -133,6 +137,7 @@ function switchToNextMode() {
 let resetTimer = () => {
   if (currentTimerInterval) {
     clearInterval(currentTimerInterval);
+    updateCurrentSession();
   }
   const resetButton = document.getElementById("resetButton");
   if (resetButton) {
@@ -183,6 +188,9 @@ function playDingSound() {
 
 // Function to update timer display based on selected mode
 let updateTime = (mode) => {
+  updateCurrentSession();
+
+
   switch (mode) {
     case "Pomodoro":
       document.getElementById('pomodoroTime').classList.remove('hidden');
@@ -208,6 +216,7 @@ let updateTime = (mode) => {
 let changeMode = () => {
   let timerModes = document.querySelector(".timerModes");
   let modeDivs = timerModes.querySelectorAll("div");
+
 
   modeDivs.forEach((div) => {
     div.addEventListener("click", () => {
