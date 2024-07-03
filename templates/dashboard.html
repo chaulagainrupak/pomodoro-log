@@ -6,7 +6,7 @@
     <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
     <title>Pomodoro-Log</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body{
@@ -27,6 +27,7 @@
         </div>
         {% else %}
         <div class="navLeft">
+            <button onclick="toggleSidebar()" class="sidebar-toggle">☰</button>
             <img src="../static/favicon.ico" alt="logo">
             <a href="/pomodoro"> <h1>Pomodoro</h1> </a>
             <a href="/about"> <h1>About</h1> </a>
@@ -42,7 +43,7 @@
         <div class="sidebar">
             {% if current_user.is_authenticated %}
                 <a href="#pomodoro" class="section-link">Pomodoro</a>
-                <a href="#about" class="section-link">About</a>
+                <a href="#statistics" class="section-link">Statistics</a>
             {% else %}
                 <a href="/login">Login</a>
                 <a href="/signup">Signup</a>
@@ -54,11 +55,14 @@
                 <div id="pomodoro" class="section">
                     <h2>Pomodoro Timer</h2>
                     <div id="timer">
-                        <div id="pomodoroTime" class="time">{{ preferences.pomodoro_duration }}:00</div>
-                        <div id="shortBreakTime" class="time hidden">{{ preferences.short_break_duration }}:00</div>
-                        <div id="longBreakTime" class="time hidden">{{ preferences.long_break_duration }}:00</div>
-                        <!-- <div id="timer-mode" class="timer-mode">Pomodoro Mode</div> -->
-
+                        <div class="clock-container">
+                            <div class="clock-face">
+                                <div class="clock-mask"></div>
+                            </div>
+                            <div id="pomodoroTime" class="time">25:00</div>
+                            <div id="shortBreakTime" class="time hidden">05:00</div>
+                            <div id="longBreakTime" class="time hidden">15:00</div>
+                        </div>
                         <div class="timerModes">
                             <div class="timerModePomodoro selected" onclick="updateTime('Pomodoro')">Pomodoro</div>
                             <div class="timerModeShortBreak" onclick="updateTime('Short Break')">Short Break</div>
@@ -68,14 +72,40 @@
                     </div>
                 </div>
     
-                <div id="about" class="section">
-                    <h2>About</h2>
-                    <p>This is the about section.</p>
+                <div id="statistics" class="section">
+                    <h2>Your Productivity Statistics</h2>
+                    <p class="intro">Explore your productivity journey and see how you've been managing your time.</p>
+                    
+                    <div class="time-range-selector">
+                        <label for="timeRange">Select Time Range:</label>
+                        <select id="timeRange">
+                            <option value="day">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="stats-container">
+                        <div class="chart-container">
+                            <canvas id="statsChart"></canvas>
+                            <p id="noDataMessage" style="display: none;">No data available for the selected time range.</p>
+                        </div>
+                        
+                        <div id="funStats" class="fun-stats"></div>
+                    </div>
+                    
+                    <div class="stats-explanation">
+                        <h3>Understanding Your Stats</h3>
+                        <p>The pie chart above shows how you've distributed your time between work sessions and breaks. A balanced distribution is key to maintaining productivity and avoiding burnout.</p>
+                        <p>The fun facts give you a different perspective on your productivity. They're meant to inspire and motivate you by showing what your focused time could achieve in other contexts.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script src="{{ url_for('static', filename='pomodoro.js') }}"></script>
+    <script src="{{ url_for('static', filename='stats.js') }}"></script>
 </body>
 </html>

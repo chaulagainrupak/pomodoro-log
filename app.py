@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
@@ -196,7 +197,6 @@ def update_session():
 
         if end_time < int(current_session.start_time):
             return jsonify({"error": "End time cannot be earlier than start time"}), 400
-        print('passed w ')
 
         if (end_time - time.time()) > allowed_time * 60:
             return jsonify({"error": "End time cannot be greater than what is defined"}), 400
@@ -215,6 +215,159 @@ def update_session():
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
 
+
+from datetime import date
+
+@app.route('/moveCompletedSessions', methods=['POST'])
+def move_completed_sessions():
+    try:
+        # Fetch all ended sessions for the current user
+        ended_sessions = CurrentSession.query.filter_by(ended=True).all()
+
+        moved_count = 0
+        for session in ended_sessions:
+            # Create a new CompletedSession
+            completed_session = CompletedSession(
+                user_id=session.user_id,
+                start_time=session.start_time,
+                end_time=session.end_time,
+                phase=session.phase,
+                duration=session.end_time - session.start_time,
+                date=date.fromtimestamp(session.start_time),
+                completed=True
+            )
+            db.session.add(completed_session)
+            
+            # Delete the session from CurrentSession
+            db.session.delete(session)
+            
+            moved_count += 1
+
+        db.session.commit()
+        return jsonify({"message": f"Moved {moved_count} sessions to CompletedSession"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route('/user_statistics')
+
+@login_required
+
+def user_statistics():
+
+    time_range = request.args.get('range')
+
+    if time_range == 'day':
+
+        delta = timedelta(days=1)
+
+    elif time_range == 'week':
+
+        delta = timedelta(days=7)
+
+    elif time_range == 'month':
+
+        delta = timedelta(days=30)  # assuming a month is 30 days
+
+    elif time_range == 'year':
+
+        delta = timedelta(days=365)
+    else:
+
+        raise ValueError("Invalid time range")
+
+
+    user_id = current_user.id
+
+    sessions = CompletedSession.query.filter_by(user_id=user_id).filter(func.date(CompletedSession.date) >= datetime.today() - delta).all()
+    # Initialize variables to store the total duration and counts
+
+    total_duration = 0
+
+    work_sessions = 0
+
+    short_breaks = 0
+
+    long_breaks = 0
+
+
+    # Iterate over the sessions to calculate the total duration and counts
+
+    for session in sessions:
+
+        total_duration += session.duration
+
+        if session.phase == 'Pomodoro':
+
+            work_sessions += 1
+
+        elif session.phase == 'Short Break':
+
+            short_breaks += 1
+
+        elif session.phase == 'Long Break':
+
+            long_breaks += 1
+
+
+    # Calculate the fun stats
+
+    total_hours = total_duration / 3600
+
+    total_minutes = total_duration / 60
+
+    total_seconds = total_duration
+
+    books_read = total_hours / 5  # Assuming 5 hours to read a book
+
+    movies_watched = total_hours / 2  # Assuming 2 hours to watch a movie
+
+    marathons_run = total_hours / 4  # Assuming 4 hours to run a marathon
+
+    chart_data = {
+        'labels': ['Work', 'Short Break', 'Long Break'],
+        'datasets': [{
+            'label': 'Time Distribution',
+            'data': [work_sessions, short_breaks, long_breaks],
+            'backgroundColor': [
+                'rgba(238, 57, 64, 0.4)',  
+                'rgba(30, 144, 255, 0.2)',  # var(--accent-blue) with opacity
+                'rgba(0, 128, 0, 0.2)',  # var(--secondary-green) with opacity
+            ],
+            'borderColor': [
+                'rgba(238, 57, 64, 0.4)',  # var(--primary-green)
+                'rgba(30, 144, 255, 1)',  # var(--accent-blue)
+                'rgba(0, 128, 0, 1)',  # var(--secondary-green)
+            ],
+            'borderWidth': 1
+        }]
+    }
+
+    fun_stats = {
+
+        'total_hours': round(total_hours, 2),
+
+        'total_minutes': round(total_minutes, 2),
+
+        'total_seconds': round(total_seconds, 0),
+
+        'work_sessions': work_sessions,
+
+        'short_breaks': short_breaks,
+
+        'long_breaks': long_breaks,
+
+        'books_read': round(books_read, 2),
+
+        'movies_watched': round(movies_watched, 2),
+
+        'marathons_run': round(marathons_run, 2)
+
+    }
+
+    return jsonify({'chart_data': chart_data, 'fun_stats': fun_stats, 'time_range': time_range})
 
 @app.errorhandler(404)
 def page_not_found(e):

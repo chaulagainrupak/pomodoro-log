@@ -2,6 +2,11 @@ let currentTimerInterval;
 let pomodoroDuration, shortBreakDuration, longBreakDuration;
 let pomodoroCount = 0;
 
+
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-open');
+}
+
 // Function to initialize the timer with durations
 function initializeTimer() {
   const startButton = document.getElementById("startButton");
@@ -48,7 +53,7 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
   if (!startButton) return;
 
   const currentMode = getCurrentMode();
-
+  initializeClock();
   createCurrentSession();
 
   let duration;
@@ -137,6 +142,7 @@ function switchToNextMode() {
 let resetTimer = () => {
   if (currentTimerInterval) {
     clearInterval(currentTimerInterval);
+    resetClock();
     updateCurrentSession();
   }
   const resetButton = document.getElementById("resetButton");
@@ -177,9 +183,22 @@ function displayTimeLeft(seconds, timeDisplayId) {
   const remainderSeconds = seconds % 60;
   const display = `${minutes}:${remainderSeconds < 10 ? '0' : ''}${remainderSeconds}`;
   document.getElementById(timeDisplayId).textContent = display;
-  console.log(display);
-}
 
+  const currentMode = getCurrentMode();
+  let totalSeconds;
+  switch (currentMode) {
+      case 'Pomodoro':
+          totalSeconds = pomodoroDuration * 60;
+          break;
+      case 'Short Break':
+          totalSeconds = shortBreakDuration * 60;
+          break;
+      case 'Long Break':
+          totalSeconds = longBreakDuration * 60;
+          break;
+  }
+  updateClockMask(totalSeconds - seconds, totalSeconds);
+}
 // Function to play the ding sound
 function playDingSound() {
   const dingSound = new Audio("/static/ding.mp3");
@@ -271,6 +290,7 @@ let getCurrentMode = () => {
 
 // Add event listener to DOMContentLoaded to initialize mode change functionality
 document.addEventListener("DOMContentLoaded", function () {
+  initializeClock();
   changeMode();
   initializeTimer();
 });

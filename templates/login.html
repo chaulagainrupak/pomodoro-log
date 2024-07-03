@@ -3,31 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
+
     <title>Login or Sign Up</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <style>
-        /* Additional styling for login/signup forms */
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+        :root {
+            --primary-green: #00b300;
+            --secondary-green: #008000;
+            --accent-blue: #1e90ff;
+            --background-white: #f0f8ff;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: var(--background-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         .form-container {
             max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none; /* Initially hidden */
+            width: 100%;
+            background-color: var(--text-light);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
         }
+
         .form-container.active {
-            display: block; /* Display when active */
+            display: block;
         }
+
+        h2 {
+            color: var(--primary-green);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--primary-green);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-green);
+            color: var(--text-light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--secondary-green);
+        }
+
+        .form-toggle {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .form-toggle button {
+            background-color: transparent;
+            color: var(--accent-blue);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+
+        .form-toggle button:hover {
+            text-decoration: underline;
+        }
+
+        .toggleButton {
+              background-color: var(--primary-green) !important;
+  color: var(--text-light) !important;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 1rem !important;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 2rem;
+        }
+
+        .toggleButton:hover {
+  background-color: var(--secondary-green) !important;
+}
     </style>
 </head>
 <body>
     {% if current_user.is_authenticated %}
     <script>
-      window.location.href = "{{ url_for('dashboard') }}";
+        window.location.href = "{{ url_for('dashboard') }}";
     </script>
-  {% endif %}
+    {% endif %}
     <div class="form-container login-form active" id="login-form">
         <h2>Login</h2>
         <form method="POST" action="{{ url_for('login') }}">
@@ -42,7 +141,6 @@
             <button type="submit">Login</button>
         </form>
     </div>
-
     <div class="form-container signup-form" id="signup-form">
         <h2>Sign Up</h2>
         <form method="POST" action="{{ url_for('signup') }}">
@@ -61,11 +159,9 @@
             <button type="submit">Sign Up</button>
         </form>
     </div>
-
     <div class="form-toggle">
-        <button onclick="toggleForm('login')">Login</button>
-        <button onclick="toggleForm('signup')">Sign Up</button>
+        <button onclick="toggleForm('login')" class="toggleButton">Login</button>
+        <button onclick="toggleForm('signup')" class="toggleButton">Sign Up</button>
     </div>
-
 </body>
 </html>

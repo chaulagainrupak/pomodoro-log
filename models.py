@@ -41,3 +41,16 @@ class CurrentSession(db.Model):
 
     user = db.relationship('User', backref=db.backref('pomodoro_sessions', lazy=True))
 
+class CompletedSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.Integer, nullable=False)
+    end_time = db.Column(db.Integer, nullable=False)
+    phase = db.Column(db.String(20), nullable=False)
+    duration = db.Column(db.Integer, nullable=False)  # Duration in seconds
+    date = db.Column(db.Date, nullable=False)  # Date of the session
+    completed = db.Column(db.Boolean, nullable=False, default=True)
+    notes = db.Column(db.Text)  # Optional field for user notes
+    tags = db.Column(db.String(255))  # Optional field for tagging sessions
+
+    user = db.relationship('User')
