@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
+    <title>Pomodoro-Log</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <script src="{{ url_for('static', filename='admin.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        {% if current_user.is_authenticated %}
+        <div class="navLeft">
+            <img src="../static/favicon.ico" alt="logo">
+            <a href="/pomodoro">
+                <h1>Pomodoro</h1>
+            </a>
+            <a href="/about">
+                <h1>About</h1>
+            </a>
+        </div>
+        <div class="navRight">
+            <a href="/dashboard">Dashboard</a>
+        </div>
+        {% else %}
+        <div class="navLeft">
+            <img src="../static/favicon.ico" alt="logo">
+            <a href="/pomodoro">
+                <h1>Pomodoro</h1>
+            </a>
+            <a href="/about">
+                <h1>About</h1>
+            </a>
+        </div>
+        <div class="navRight">
+            <a href="/login">Login / Signup</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="content">
+        <div class="sidebar">
+            <div class="sidebarTop">
+                {% if current_user.is_authenticated %}
+                <a href="#activate" class="section-link">🔓 Activate Accounts</a>
+                {% else %}
+                <a href="/login">Login</a>
+                <a href="/signup">Signup</a>
+                {% endif %}
+            </div>
+
+            <div class="sidebarBottom">
+                {% if current_user.role == 'admin' %}
+                <!-- <a href="/adminDashboard" class="section-link">👨‍💻 Admin Dashboard</a> -->
+                {% endif %}
+                <a href="/settings" class="section-link">⚙️ Settings</a>
+            </div>
+        </div>
+
+        <div class="userContent">
+            <div class="sections">
+                <div id="activate" class="section">
+                    <h2>Activate Accounts</h2>
+
+                    <div class="search-container">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search for users...">
+                        <label for="sortSelect">Sort by: </label>
+                        <select id="sortSelect" onchange="sortTable()">
+                            <option value="username_asc">Username (A-Z)</option>
+                            <option value="username_desc">Username (Z-A)</option>
+                            <option value="email_asc">Email (A-Z)</option>
+                            <option value="email_desc">Email (Z-A)</option>
+                            <option value="signup_asc">Signup Time (Oldest first)</option>
+                            <option value="signup_desc">Signup Time (Newest first)</option>
+                        </select>
+                    </div>
+
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Signup Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users.items %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.signup_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    <button onclick="activateUser({{ user.id }})">Activate</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        {% if users.has_prev %}
+                        <a href="{{ url_for('adminDashboard', page=users.prev_num) }}">&laquo; Previous</a>
+                        {% endif %}
+
+                        {% for page_num in users.iter_pages() %}
+                            {% if page_num %}
+                                {% if users.page == page_num %}
+                                    <a class="active" href="#">{{ page_num }}</a>
+                                {% else %}
+                                    <a href="{{ url_for('adminDashboard', page=page_num) }}">{{ page_num }}</a>
+                                {% endif %}
+                            {% else %}
+                                <span class="ellipsis">...</span>
+                            {% endif %}
+
+                            {% if page_num and loop.index == 10 and users.pages > 10 %}
+                                <span class="ellipsis">...</span>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if users.has_next %}
+                        <a href="{{ url_for('adminDashboard', page=users.next_num) }}">Next &raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -18,8 +18,11 @@
 <body>
     <div class="nav">
         {% if current_user.is_authenticated %}
+
         <div class="navLeft">
             <img src="../static/favicon.ico" alt="logo">
+            <a href="/pomodoro"> <h1>Pomodoro</h1> </a>
+            <a href="/about"> <h1>About</h1> </a>
         </div>
 
         <div class="navRight">
@@ -27,12 +30,10 @@
         </div>
         {% else %}
         <div class="navLeft">
-            <button onclick="toggleSidebar()" class="sidebar-toggle">☰</button>
             <img src="../static/favicon.ico" alt="logo">
             <a href="/pomodoro"> <h1>Pomodoro</h1> </a>
             <a href="/about"> <h1>About</h1> </a>
         </div>
-
         <div class="navRight">
             <a href="/login">Login / Signup</a>
         </div>
@@ -41,13 +42,22 @@
 
     <div class="content">
         <div class="sidebar">
+            <div class="sidebarTop">
             {% if current_user.is_authenticated %}
-                <a href="#pomodoro" class="section-link">Pomodoro</a>
-                <a href="#statistics" class="section-link">Statistics</a>
+                <a href="#pomodoro" class="section-link">🍅 Pomodoro</a>
+                <a href="#statistics" class="section-link">📊 Statistics</a>
             {% else %}
                 <a href="/login">Login</a>
                 <a href="/signup">Signup</a>
             {% endif %}
+            </div>
+
+            <div class="sidebarBottom">
+                {% if current_user.role == 'admin' %}
+                    <a href="/adminDashboard" class="section-link">👨‍💻 Admin Dashboard</a>
+                {% endif %}
+                    <a href="/settings" class="section-link">⚙️ Settings</a>
+            </div>
         </div>
 
         <div class="userContent">
@@ -57,7 +67,6 @@
                     <div id="timer">
                         <div class="clock-container">
                             <div class="clock-face">
-                                <div class="clock-mask"></div>
                             </div>
                             <div id="pomodoroTime" class="time">25:00</div>
                             <div id="shortBreakTime" class="time hidden">05:00</div>

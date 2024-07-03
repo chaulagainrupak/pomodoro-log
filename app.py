@@ -16,6 +16,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
 from datetime import datetime , timedelta
 import time
+import re
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super secret key man!'
@@ -70,42 +72,59 @@ def login():
         user = User.query.filter((User.username == username_or_email) | (User.email == username_or_email)).first()
         if user and check_password_hash(user.password, password) and user.activate:
             login_user(user)
-            user.last_login_time = datetime.utcnow()  
+            user.last_login_time = datetime.utcnow()
             db.session.commit()
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid username or email, password, or account not activated')
+            flash('Invalid username or email, password, or account not activated', 'error')
     return render_template('login.html')
 
-@app.route('/signup', methods=['POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            flash('Username already exists!')
-        else:
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
-            new_user = User(username=username, password=hashed_password, activate=False, email=email)
-            db.session.add(new_user)
-            db.session.commit()
 
-            # Create default user preferences
-            preferences = UserPreferences(user_id=new_user.id)
-            db.session.add(preferences)
-            db.session.commit()
+        # Validate username and password
+        if not re.match(r'^[a-zA-Z0-9_]{3,}$', username):
+            flash('Username must be at least 3 characters long and contain only letters, numbers, and underscores.', 'error')
+            return redirect(url_for('signup'))
+        if not re.match(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', password):
+            flash('Password must be at least 8 characters long and contain a letter, a number, and a special character.', 'error')
+            return redirect(url_for('signup'))
+        
+        try:
+            existing_user = User.query.filter_by(username=username).first()
+            existing_email = User.query.filter_by(email=email).first()
+            if existing_user:
+                flash('Username already exists!', 'error')
+            elif existing_email:
+                flash('Email already exists!', 'error')
+            else:
+                hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+                new_user = User(username=username, password=hashed_password, activate=False, email=email)
+                db.session.add(new_user)
+                db.session.commit()
 
-            flash('Account created successfully! Please wait for activation.')
-            return redirect(url_for('login'))
-    return redirect(url_for('login'))
+                # Create default user preferences
+                preferences = UsersPreferences(user_id=new_user.id)
+                db.session.add(preferences)
+                db.session.commit()
+
+                flash('Account created successfully! Please wait for activation.', 'success')
+                return redirect(url_for('login'))
+        except Exception as e:
+            print(e)
+            flash('An error occurred while creating your account. Please try again.', 'error')
+            db.session.rollback()
+    return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('hello'))
 
 @app.route('/dashboard')
 @login_required
@@ -113,6 +132,15 @@ def dashboard():
     preferences = UsersPreferences.query.filter_by(user_id=current_user.id).first()
     return render_template('dashboard.html', user=current_user, preferences=preferences)
 
+@app.route('/adminDashboard')
+@login_required
+def adminDashboard():
+    if current_user.role == 'admin':
+        page = request.args.get('page', 1, type=int)
+        users = User.query.filter_by(activate=False).paginate(page=page, per_page=20)
+        return render_template('adminDashboard.html', users=users)
+    else:
+        return redirect('/')
 
 
 @app.route('/activate_user/<int:user_id>', methods=['POST'])

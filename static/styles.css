@@ -50,7 +50,7 @@ body {
 }
 
 .navLeft a {
-  color: var(--text-light);
+  color: var(--text-light) !important;
   text-decoration: none;
   font-size: 1.1rem;
   font-weight: 500;
@@ -94,6 +94,10 @@ body {
   padding: 20px;
   overflow-y: auto;
   border-right: 1px solid var(--secondary-green);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .section-link {
   display: block;
@@ -314,17 +318,6 @@ body {
   overflow: hidden;
 }
 
-.clock-mask {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  background-color: var(--accent-blue);
-  opacity: 0.4;
-  right: 0;
-  transform-origin: left center;
-  transition: transform 0.1s linear;
-}
-
 .time {
   position: absolute;
   top: 50%;
@@ -349,14 +342,6 @@ body {
   }
 }
 
-.sidebar-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: var(--text-light);
-  font-size: 1.5rem;
-  cursor: pointer;
-}
 
 @media (max-width: 1024px) {
   .sidebar-toggle {

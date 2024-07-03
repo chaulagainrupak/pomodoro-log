@@ -53,7 +53,6 @@ let startTimer = (pomoDuration, shortBreakDur, longBreakDur) => {
   if (!startButton) return;
 
   const currentMode = getCurrentMode();
-  initializeClock();
   createCurrentSession();
 
   let duration;
@@ -142,7 +141,6 @@ function switchToNextMode() {
 let resetTimer = () => {
   if (currentTimerInterval) {
     clearInterval(currentTimerInterval);
-    resetClock();
     updateCurrentSession();
   }
   const resetButton = document.getElementById("resetButton");
@@ -197,7 +195,6 @@ function displayTimeLeft(seconds, timeDisplayId) {
           totalSeconds = longBreakDuration * 60;
           break;
   }
-  updateClockMask(totalSeconds - seconds, totalSeconds);
 }
 // Function to play the ding sound
 function playDingSound() {
@@ -290,7 +287,6 @@ let getCurrentMode = () => {
 
 // Add event listener to DOMContentLoaded to initialize mode change functionality
 document.addEventListener("DOMContentLoaded", function () {
-  initializeClock();
   changeMode();
   initializeTimer();
 });
