@@ -302,7 +302,7 @@ let times = document.querySelectorAll('.time');
 
 
 let settings = () => {
-  window.location.href = 'http://0.0.0.0:5000/settings';
+  window.location.href = '/settings';
 }
 
 let moveCompletedSessions = () => {
@@ -313,5 +313,5 @@ let moveCompletedSessions = () => {
 
 let reloadStats = () =>{
   moveCompletedSessions();
-  location.reload(forcedReload);
+  location.reload();
 }
