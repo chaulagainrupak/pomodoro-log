@@ -234,13 +234,13 @@ def update_session():
 
         phase = data['phase']
 
-        current_session = CurrentSession.query.filter_by(user_id=current_user.id, ended=False).order_by(CurrentSession.start_time.desc()).first()
+        current_session = CurrentSession.query.filter_by(user_id=current_user.id).order_by(CurrentSession.start_time.desc()).first()
         user_preference = UsersPreferences.query.filter_by(user_id=current_user.id).first()
 
         if not current_session:
             return jsonify({"error": "No active session found, This is nothing to worry about!"}), 201
 
-        if end_time < current_session.start_time:
+        if end_time < int(current_session.start_time):
             return jsonify({"error": "End time cannot be earlier than start time"}), 400
 
         if phase == 'Pomodoro':
