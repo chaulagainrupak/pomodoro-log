@@ -246,7 +246,7 @@ def update_session():
         expected_end_time = current_session.start_time + expected_duration
 
         # Allow for a 20-second discrepancy
-        allowed_discrepancy = 20
+        allowed_discrepancy = 80
         
         if abs(received_end_time - expected_end_time) > allowed_discrepancy:
             # If the discrepancy is too large, log it but still accept the data
