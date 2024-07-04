@@ -246,17 +246,17 @@ def update_session():
 
         # Allow for a 20-second discrepancy
         allowed_discrepancy = 80
-        
 
         if abs(received_end_time - expected_end_time) > allowed_discrepancy:
             # If the discrepancy is too large, log it but still accept the data
             app.logger.warning(f"Large time discrepancy detected for user {current_user.id}. Expected: {expected_end_time}, Received: {received_end_time}, discrepancy by: {abs(received_end_time - expected_end_time)} ")
-        
+
         # Use the received end_time, but ensure it's not earlier than start_time
         end_time = max(received_end_time, current_session.start_time)
 
-        if end_time - current_session.start_time == 0:
-            end_time = expected_duration
+        # Check if duration is zero or negative and adjust end_time accordingly
+        if end_time <= current_session.start_time:
+            end_time = current_session.start_time + expected_duration
             duration_zero_used = True
         else:
             duration_zero_used = False
@@ -274,9 +274,9 @@ def update_session():
         }), 200
 
     except Exception as e:
-        db.session.rollback()
-        app.logger.error(f"Error updating session for user {current_user.id}: {str(e)}")
-        return jsonify({"error": str(e)}), 400
+        app.logger.error(f"Error updating session for user {current_user.id}: {e}")
+        return jsonify({"error": "Failed to update session"}), 500
+
 
 
 
@@ -403,6 +403,7 @@ def user_statistics():
     sessions = CompletedSession.query.filter_by(user_id=user_id)\
     .filter(func.date(CompletedSession.date) >= datetime.today() - delta)\
     .filter(CompletedSession.duration >= 0).all()
+
     # Initialize variables to store the total duration and counts
 
     total_duration = 0
