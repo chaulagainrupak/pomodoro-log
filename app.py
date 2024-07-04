@@ -280,41 +280,39 @@ from datetime import date
 @login_required
 def move_completed_sessions():
     try:
-        # Fetch all ended sessions for the current user
-        ended_sessions = CurrentSession.query.filter_by(ended=True).all()
-        non_ended_sessions = CurrentSession.query.filter_by(ended=False).all()
+        # Fetch all sessions for the current user
+        current_user_sessions = CurrentSession.query.filter_by(user_id=current_user.id).all()
+        
         moved_count = 0
         deleted_count = 0
         non_completed_count = 0
-        for session in ended_sessions:
-            # Create a new CompletedSession
-            completed_session = CompletedSession(
-                user_id=session.user_id,
-                start_time=session.start_time,
-                end_time=session.end_time,
-                phase=session.phase,
-                duration=session.end_time - session.start_time,
-                date=date.fromtimestamp(session.start_time),
-                completed=True
-            )
-            db.session.add(completed_session)
-            # Delete the session from CurrentSession
-            db.session.delete(session)
-            
-            moved_count += 1
-            deleted_count += 1
-
-        for session in non_ended_sessions:
-            non_completed_count += 1
-            db.session.delete(session)
-            deleted_count += 1
-
+        
+        for session in current_user_sessions:
+            if session.end_time is not None:  # Check if the session has ended
+                # Create a new CompletedSession
+                completed_session = CompletedSession(
+                    user_id=session.user_id,
+                    start_time=session.start_time,
+                    end_time=session.end_time,
+                    phase=session.phase,
+                    duration=session.end_time - session.start_time,
+                    date=datetime.fromtimestamp(session.start_time).date()
+                )
+                db.session.add(completed_session)
+                db.session.delete(session)
+                moved_count += 1
+                deleted_count += 1
+            else:
+                # For non-ended sessions, we'll just count them
+                non_completed_count += 1
+        
         db.session.commit()
+        
         return jsonify({
-            "message": f"Moved {moved_count} completed sessions to CompletedSession and deleted {deleted_count} non-completed sessions",
+            "message": f"Moved {moved_count} completed sessions to CompletedSession and deleted {deleted_count} sessions",
             "non_completed_count": non_completed_count
         }), 200
-
+    
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
