@@ -312,5 +312,6 @@ let moveCompletedSessions = () => {
 }
 
 let reloadStats = () =>{
-  window.location.reload();
+  moveCompletedSessions();
+  location.reload(forcedReload);
 }
