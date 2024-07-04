@@ -304,7 +304,7 @@ def move_completed_sessions():
                     end_time=session.end_time,
                     phase=session.phase,
                     duration=session.end_time - session.start_time,
-                    date=datetime.fromtimestamp(session.start_time).date()
+                    date=datetime.fromtimestamp(session.start_time)
                 )
                 db.session.add(completed_session)
                 db.session.delete(session)

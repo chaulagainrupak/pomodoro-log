@@ -51,11 +51,8 @@ let updateCurrentSession = () => {
     })
     .then(data => {
         console.log('Session updated:', data);
-        let serverDuration = data.actual_duration;
-        let clientDuration = clientEndTime - sessionStartTime; // Assuming you store the start time
-        if (Math.abs(serverDuration - clientDuration) > 30) { // 30 seconds threshold
-            console.warn('Large discrepancy between client and server duration detected');
-        }
+        // let serverDuration = data.actual_duration;
+        // let clientDuration = clientEndTime - sessionStartTime; 
     })
     .catch(error => {
         console.error('Error updating session:', error);

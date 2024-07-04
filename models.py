@@ -46,7 +46,7 @@ class CompletedSession(db.Model):
     end_time = db.Column(db.Integer, nullable=False)
     phase = db.Column(db.String(20), nullable=False)
     duration = db.Column(db.Integer, nullable=False)  # Duration in seconds
-    date = db.Column(db.Date, nullable=False)  # Date of the session
+    date = db.Column(db.DateTime, nullable=False)  # Date of the session
     completed = db.Column(db.Boolean, nullable=False, default=True)
     notes = db.Column(db.Text)  # Optional field for user notes
     tags = db.Column(db.String(255))  # Optional field for tagging sessions
