@@ -230,7 +230,7 @@ def update_session():
             return jsonify({"error": "Invalid input"}), 400
 
         data = request.json
-        end_time = int(data['end_time'])
+        end_time = int(time.time())
 
         phase = data['phase']
 
