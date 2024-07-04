@@ -256,22 +256,31 @@ def update_session():
 
         # Check if duration is zero or negative and adjust end_time accordingly
         if end_time <= current_session.start_time:
-            end_time =  expected_duration - abs(received_end_time - expected_end_time)
+            end_duration = expected_duration - abs(received_end_time - expected_end_time)
+            end_time =  time.time()
             duration_zero_used = True
+            
+            message = {
+            "message": "Session updated",
+            "session_id": current_session.id,
+            "actual_duration": end_duration,
+            "duration_zero_used": duration_zero_used
+        }
         else:
             duration_zero_used = False
+            message = {
+            "message": "Session updated",
+            "session_id": current_session.id,
+            "actual_duration": end_durationend_time - current_session.start_time,
+            "duration_zero_used": duration_zero_used
+        }
 
         # Update the current session
         current_session.end_time = end_time
         current_session.phase = phase  # Update phase in case it changed
         db.session.commit()
 
-        return jsonify({
-            "message": "Session updated",
-            "session_id": current_session.id,
-            "actual_duration": end_time - current_session.start_time,
-            "duration_zero_used": duration_zero_used
-        }), 200
+        return jsonify(message), 200
 
     except Exception as e:
         app.logger.error(f"Error updating session for user {current_user.id}: {e}")
