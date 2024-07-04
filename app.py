@@ -376,68 +376,53 @@ def settings():
 @app.route('/user_statistics')
 @login_required
 def user_statistics():
-
     time_range = request.args.get('range')
 
     if time_range == 'day':
-
         delta = timedelta(days=1)
-
     elif time_range == 'week':
-
         delta = timedelta(days=7)
-
     elif time_range == 'month':
-
         delta = timedelta(days=30)  # assuming a month is 30 days
-
     elif time_range == 'year':
-
         delta = timedelta(days=365)
+    elif time_range == 'all_time':
+        delta = None  # No delta means fetch all sessions
     else:
-
         raise ValueError("Invalid time range")
-
 
     user_id = current_user.id
 
-    sessions = CompletedSession.query.filter_by(user_id=user_id)\
-    .filter(func.date(CompletedSession.date) >= datetime.today() - delta)\
-    .filter(CompletedSession.duration >= 0).all()
+    if time_range == 'all_time':
+        sessions = CompletedSession.query.filter_by(user_id=user_id)\
+            .filter(CompletedSession.duration >= 0).all()
+    else:
+        sessions = CompletedSession.query.filter_by(user_id=user_id)\
+            .filter(func.date(CompletedSession.date) >= datetime.today() - delta)\
+            .filter(CompletedSession.duration >= 0).all()
 
     # Initialize variables to store the total duration and counts
-
     total_duration = 0
     work_sessions = 0
     short_breaks = 0
     long_breaks = 0
 
-
     # Iterate over the sessions to calculate the total duration and counts
-
     for session in sessions:
-
         total_duration += session.duration
 
         if session.phase == 'Pomodoro':
-
             work_sessions += 1
-
         elif session.phase == 'Short Break':
-
             short_breaks += 1
-
         elif session.phase == 'Long Break':
-
             long_breaks += 1
-
-
-    # Calculate the fun stats
 
     # Calculate the fun stats
     total_hours = total_duration / 3600
     total_minutes = total_duration / 60
     total_seconds = total_duration
+
     books_read = total_hours / 5  # Assuming 5 hours to read a book
     movies_watched = total_hours / 2  # Assuming 2 hours to watch a movie
     marathons_run = total_hours / 4  # Assuming 4 hours to run a marathon
@@ -447,7 +432,8 @@ def user_statistics():
     podcasts_listened = total_hours / 1.5  # Assuming 1.5 hours to listen to a podcast
     naps_taken = total_hours / 0.5  # Assuming 0.5 hours to take a nap
 
-    chart_data = {
+    # Prepare data for pie chart (time distribution)
+    pie_chart_data = {
         'labels': ['Work', 'Short Break', 'Long Break'],
         'datasets': [{
             'label': 'Time Distribution',
@@ -466,6 +452,18 @@ def user_statistics():
         }]
     }
 
+    # Prepare data for line chart (session durations over time)
+    line_chart_data = {
+        'labels': [session.date.strftime('%Y-%m-%d') for session in sessions],
+        'datasets': [{
+            'label': 'Session Durations',
+            'data': [session.duration for session in sessions],
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
     fun_stats = {
         'total_hours': round(total_hours, 2),
         'total_minutes': round(total_minutes, 2),
@@ -481,10 +479,14 @@ def user_statistics():
         'songs_listened': round(songs_listened, 0),
         'podcasts_listened': round(podcasts_listened, 2),
         'naps_taken': round(naps_taken, 2)
-        }
+    }
 
-    return jsonify({'chart_data': chart_data, 'fun_stats': fun_stats, 'time_range': time_range})
-
+    return jsonify({
+        'pie_chart_data': pie_chart_data,
+        'line_chart_data': line_chart_data,
+        'fun_stats': fun_stats,
+        'time_range': time_range
+    })
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404 
