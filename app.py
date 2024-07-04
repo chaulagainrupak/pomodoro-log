@@ -400,7 +400,9 @@ def user_statistics():
 
     user_id = current_user.id
 
-    sessions = CompletedSession.query.filter_by(user_id=user_id).filter(func.date(CompletedSession.date) >= datetime.today() - delta).all()
+    sessions = CompletedSession.query.filter_by(user_id=user_id)\
+    .filter(func.date(CompletedSession.date) >= datetime.today() - delta)\
+    .filter(CompletedSession.duration >= 0).all()
     # Initialize variables to store the total duration and counts
 
     total_duration = 0
