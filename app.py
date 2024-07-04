@@ -226,6 +226,7 @@ def start_session():
 @login_required
 def update_session():
     try:
+        print("debug 1 got here")
         if not request.json or 'end_time' not in request.json or 'phase' not in request.json:
             return jsonify({"error": "Invalid input"}), 400
 
@@ -233,6 +234,7 @@ def update_session():
         end_time = int(time.time())
 
         phase = data['phase']
+        print("debug 2 got here")
 
         current_session = CurrentSession.query.filter_by(user_id=current_user.id).order_by(CurrentSession.start_time.desc()).first()
         user_preference = UsersPreferences.query.filter_by(user_id=current_user.id).first()
@@ -253,9 +255,12 @@ def update_session():
         if end_time - current_session.start_time > (allowed_time * 60 + 20):
             return jsonify({"error": "End time cannot be greater than what is defined"}), 400
 
+        print("debug 3 got here")
+
         current_session.ended = True
         current_session.end_time = end_time
         db.session.commit()
+
 
         # Calculate the time difference for logging purposes
         time_difference = current_session.end_time - current_session.start_time
