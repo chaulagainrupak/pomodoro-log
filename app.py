@@ -256,7 +256,7 @@ def update_session():
 
         # Check if duration is zero or negative and adjust end_time accordingly
         if end_time <= current_session.start_time:
-            end_time = current_session.start_time + expected_duration
+            end_time = time.time() - current_session.start_time
             duration_zero_used = True
         else:
             duration_zero_used = False
