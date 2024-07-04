@@ -189,29 +189,28 @@ def stat():
 @login_required
 def start_session():
     try:
-        print("Request data:", request.json)  # Debugging line
         user_preferences = UsersPreferences.query.filter_by(user_id=current_user.id).first()
         
         if not user_preferences:
             return jsonify({"error": "User preferences not found"}), 404
 
         data = request.json
-        print("Data received:", data)  # Debugging line
-        if data['phase'] == 'Pomodoro':
+        phase = data['phase']
+        
+        if phase == 'Pomodoro':
             duration_minutes = user_preferences.pomodoro_duration
-        elif data['phase'] == 'Short Break':
+        elif phase == 'Short Break':
             duration_minutes = user_preferences.short_break_duration
         else:
             duration_minutes = user_preferences.long_break_duration
         
-        start_time = round(time.time(), 0)
+        start_time = int(time.time())
         end_time = start_time + duration_minutes * 60
-        print("End time:", end_time)  # Debugging line
 
         new_session = CurrentSession(
             user_id=current_user.id,
             start_time=start_time,
-            phase=data['phase'],
+            phase=phase,
             end_time=end_time
         )
         db.session.add(new_session)
@@ -219,56 +218,58 @@ def start_session():
         return jsonify({"message": "Session started", "session_id": new_session.id}), 200
     except Exception as e:
         db.session.rollback()
-        print("Error:", str(e))  # Debugging line
         return jsonify({"error": str(e)}), 400
+
+from datetime import datetime, timedelta
 
 @app.route('/updateSession', methods=['POST'])
 @login_required
 def update_session():
     try:
-        print("debug 1 got here")
-        if not request.json or 'end_time' not in request.json or 'phase' not in request.json:
-            return jsonify({"error": "Invalid input"}), 400
-
         data = request.json
         end_time = int(time.time())
-
         phase = data['phase']
-        print("debug 2 got here")
 
-        current_session = CurrentSession.query.filter_by(user_id=current_user.id).order_by(CurrentSession.start_time.desc()).first()
-        user_preference = UsersPreferences.query.filter_by(user_id=current_user.id).first()
+        current_session = CurrentSession.query.filter_by(user_id=current_user.id, end_time=None).order_by(CurrentSession.start_time.desc()).first()
 
         if not current_session:
-            return jsonify({"error": "No active session found, This is nothing to worry about!"}), 201
+            return jsonify({"error": "No active session found"}), 404
 
-        if end_time < int(current_session.start_time):
-            return jsonify({"error": "End time cannot be earlier than start time"}), 400
+        # Allow for a 20-second discrepancy
+        allowed_discrepancy = 20
+        expected_end_time = current_session.start_time + (current_session.end_time - current_session.start_time)
+        
+        if abs(end_time - expected_end_time) > allowed_discrepancy:
+            # If the discrepancy is too large, log it but still accept the data
+            app.logger.warning(f"Large time discrepancy detected for user {current_user.id}. Expected: {expected_end_time}, Received: {end_time}")
+            
+        # Use the received end_time, but ensure it's not earlier than start_time
+        end_time = max(end_time, current_session.start_time)
 
-        if phase == 'Pomodoro':
-            allowed_time = user_preference.pomodoro_duration
-        elif phase == 'Short Break':
-            allowed_time = user_preference.short_break_duration
-        else:
-            allowed_time = user_preference.long_break_duration
-
-        if end_time - current_session.start_time > (allowed_time * 60 + 20):
-            return jsonify({"error": "End time cannot be greater than what is defined"}), 400
-
-        print("debug 3 got here")
-
-        current_session.ended = True
         current_session.end_time = end_time
         db.session.commit()
 
+        # Move to CompletedSession
+        completed_session = CompletedSession(
+            user_id=current_user.id,
+            start_time=current_session.start_time,
+            end_time=end_time,
+            phase=phase,
+            duration=end_time - current_session.start_time,
+            date=datetime.fromtimestamp(current_session.start_time).date()
+        )
+        db.session.add(completed_session)
+        db.session.delete(current_session)
+        db.session.commit()
 
-        # Calculate the time difference for logging purposes
-        time_difference = current_session.end_time - current_session.start_time
-        print("Time difference:", time_difference)
-
-        return jsonify({"message": "Session updated", "session_id": current_session.id}), 200
+        return jsonify({
+            "message": "Session updated and moved to completed", 
+            "session_id": completed_session.id,
+            "actual_duration": end_time - current_session.start_time
+        }), 200
     except Exception as e:
         db.session.rollback()
+        app.logger.error(f"Error updating session for user {current_user.id}: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
 

@@ -30,11 +30,11 @@ let createCurrentSession = () => {
 
 let updateCurrentSession = () => {
     let phase = getCurrentMode();
+    let clientEndTime = Math.floor(new Date().getTime() / 1000);
     let sessionData = {
-        end_time: Math.floor(new Date().getTime() / 1000), // Convert current time to epoch time in seconds
-        phase: phase
+        phase: phase,
+        client_end_time: clientEndTime
     };
-
     fetch('/updateSession', {
         method: 'POST',
         headers: {
@@ -50,10 +50,15 @@ let updateCurrentSession = () => {
         }
     })
     .then(data => {
-        console.log(data);
+        console.log('Session updated:', data);
+        let serverDuration = data.actual_duration;
+        let clientDuration = clientEndTime - sessionStartTime; // Assuming you store the start time
+        if (Math.abs(serverDuration - clientDuration) > 30) { // 30 seconds threshold
+            console.warn('Large discrepancy between client and server duration detected');
+        }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Error updating session:', error);
     });
 }
 

@@ -34,11 +34,9 @@ class CurrentSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     start_time = db.Column(db.Integer, nullable=False)
-    end_time = db.Column(db.Integer, nullable=False)
-    phase = db.Column(db.String(20), nullable=False)  # e.g., 'work', 'short-break', 'long-break'
-    ended = db.Column(db.Boolean, nullable=False, default=False)
-
-
+    end_time = db.Column(db.Integer)
+    phase = db.Column(db.String(20), nullable=False)
+    
     user = db.relationship('User', backref=db.backref('pomodoro_sessions', lazy=True))
 
 class CompletedSession(db.Model):
