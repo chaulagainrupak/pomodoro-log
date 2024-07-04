@@ -205,13 +205,12 @@ def start_session():
             duration_minutes = user_preferences.long_break_duration
         
         start_time = int(time.time())
-        end_time = start_time + duration_minutes * 60
 
         new_session = CurrentSession(
             user_id=current_user.id,
             start_time=start_time,
             phase=phase,
-            end_time=end_time
+            end_time=None  # Set end_time to None initially
         )
         db.session.add(new_session)
         db.session.commit()
@@ -220,53 +219,53 @@ def start_session():
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
 
-from datetime import datetime, timedelta
+
 
 @app.route('/updateSession', methods=['POST'])
 @login_required
 def update_session():
     try:
         data = request.json
-        end_time = int(time.time())
+        received_end_time = data.get('client_end_time', int(time.time()))
         phase = data['phase']
 
         current_session = CurrentSession.query.filter_by(user_id=current_user.id, end_time=None).order_by(CurrentSession.start_time.desc()).first()
 
         if not current_session:
-            return jsonify({"error": "No active session found"}), 404
+            return jsonify({"error": "No active session found"}), 200
+
+        # Calculate expected end time based on start time and phase duration
+        user_preferences = UsersPreferences.query.filter_by(user_id=current_user.id).first()
+        if phase == 'Pomodoro':
+            expected_duration = user_preferences.pomodoro_duration * 60
+        elif phase == 'Short Break':
+            expected_duration = user_preferences.short_break_duration * 60
+        else:
+            expected_duration = user_preferences.long_break_duration * 60
+
+        expected_end_time = current_session.start_time + expected_duration
 
         # Allow for a 20-second discrepancy
         allowed_discrepancy = 20
-        expected_end_time = current_session.start_time + (current_session.end_time - current_session.start_time)
         
-        if abs(end_time - expected_end_time) > allowed_discrepancy:
+        if abs(received_end_time - expected_end_time) > allowed_discrepancy:
             # If the discrepancy is too large, log it but still accept the data
-            app.logger.warning(f"Large time discrepancy detected for user {current_user.id}. Expected: {expected_end_time}, Received: {end_time}")
-            
+            app.logger.warning(f"Large time discrepancy detected for user {current_user.id}. Expected: {expected_end_time}, Received: {received_end_time}")
+        
         # Use the received end_time, but ensure it's not earlier than start_time
-        end_time = max(end_time, current_session.start_time)
+        end_time = max(received_end_time, current_session.start_time)
 
+        # Update the current session
         current_session.end_time = end_time
-        db.session.commit()
-
-        # Move to CompletedSession
-        completed_session = CompletedSession(
-            user_id=current_user.id,
-            start_time=current_session.start_time,
-            end_time=end_time,
-            phase=phase,
-            duration=end_time - current_session.start_time,
-            date=datetime.fromtimestamp(current_session.start_time).date()
-        )
-        db.session.add(completed_session)
-        db.session.delete(current_session)
+        current_session.phase = phase  # Update phase in case it changed
         db.session.commit()
 
         return jsonify({
-            "message": "Session updated and moved to completed", 
-            "session_id": completed_session.id,
+            "message": "Session updated", 
+            "session_id": current_session.id,
             "actual_duration": end_time - current_session.start_time
         }), 200
+
     except Exception as e:
         db.session.rollback()
         app.logger.error(f"Error updating session for user {current_user.id}: {str(e)}")
