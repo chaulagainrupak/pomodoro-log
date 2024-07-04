@@ -289,7 +289,8 @@ let getCurrentMode = () => {
 document.addEventListener("DOMContentLoaded", function () {
   
 let times = document.querySelectorAll('.time');
-  
+
+  moveCompletedSessions();
   times.forEach(time => {
     time.addEventListener('click', settings);
   });
@@ -302,4 +303,14 @@ let times = document.querySelectorAll('.time');
 
 let settings = () => {
   window.location.href = 'http://0.0.0.0:5000/settings';
+}
+
+let moveCompletedSessions = () => {
+  fetch('/moveCompletedSessions', {
+    method: 'POST'
+  });
+}
+
+let reloadStats = () =>{
+  window.location.reload();
 }

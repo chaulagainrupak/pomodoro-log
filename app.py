@@ -204,7 +204,7 @@ def start_session():
         else:
             duration_minutes = user_preferences.long_break_duration
         
-        start_time = data['start_time']
+        start_time = round(time.time(), 0)
         end_time = start_time + duration_minutes * 60
         print("End time:", end_time)  # Debugging line
 
@@ -271,6 +271,7 @@ def update_session():
 from datetime import date
 
 @app.route('/moveCompletedSessions', methods=['POST'])
+@login_required
 def move_completed_sessions():
     try:
         # Fetch all ended sessions for the current user

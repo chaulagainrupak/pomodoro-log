@@ -348,3 +348,9 @@ body {
     display: block;
   }
 }
+
+.reloadStats {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
