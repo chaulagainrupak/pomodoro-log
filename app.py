@@ -256,8 +256,10 @@ def update_session():
         end_time = max(received_end_time, current_session.start_time)
 
         if end_time - current_session.start_time == 0:
-            end_time = expected_duration 
-
+            end_time = expected_duration
+            duration_zero_used = True
+        else:
+            duration_zero_used = False
 
         # Update the current session
         current_session.end_time = end_time
@@ -265,9 +267,10 @@ def update_session():
         db.session.commit()
 
         return jsonify({
-            "message": "Session updated", 
+            "message": "Session updated",
             "session_id": current_session.id,
-            "actual_duration": end_time - current_session.start_time
+            "actual_duration": end_time - current_session.start_time,
+            "duration_zero_used": duration_zero_used
         }), 200
 
     except Exception as e:
