@@ -250,7 +250,7 @@ def update_session():
         else:
             allowed_time = user_preference.long_break_duration
 
-        if end_time - current_session.start_time > allowed_time * 60:
+        if end_time - current_session.start_time > (allowed_time * 60 + 20):
             return jsonify({"error": "End time cannot be greater than what is defined"}), 400
 
         current_session.ended = True
