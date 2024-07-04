@@ -271,7 +271,7 @@ def update_session():
             message = {
             "message": "Session updated",
             "session_id": current_session.id,
-            "actual_duration": end_durationend_time - current_session.start_time,
+            "actual_duration": end_time - current_session.start_time,
             "duration_zero_used": duration_zero_used
         }
 
