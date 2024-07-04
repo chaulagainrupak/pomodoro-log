@@ -253,34 +253,27 @@ def update_session():
 
         # Use the received end_time, but ensure it's not earlier than start_time
         end_time = max(received_end_time, current_session.start_time)
-
-        # Check if duration is zero or negative and adjust end_time accordingly
+        #there is some stupid bug with some zero thing 
+        # Check if duration is zero or negative and handle accordingly
         if end_time <= current_session.start_time:
-            end_duration = expected_duration - abs(received_end_time - expected_end_time)
-            end_time =  time.time()
-            duration_zero_used = True
-            
-            message = {
-            "message": "Session updated",
-            "session_id": current_session.id,
-            "actual_duration": end_duration,
-            "duration_zero_used": duration_zero_used
-        }
-        else:
-            duration_zero_used = False
-            message = {
-            "message": "Session updated",
-            "session_id": current_session.id,
-            "actual_duration": end_time - current_session.start_time,
-            "duration_zero_used": duration_zero_used
-        }
+            return jsonify({
+                "message": "Duration is zero or negative, session not updated",
+                "session_id": current_session.id,
+                "actual_duration": 0,
+                "duration_zero_used": True
+            }), 200
 
         # Update the current session
         current_session.end_time = end_time
         current_session.phase = phase  # Update phase in case it changed
         db.session.commit()
 
-        return jsonify(message), 200
+        return jsonify({
+            "message": "Session updated",
+            "session_id": current_session.id,
+            "actual_duration": end_time - current_session.start_time,
+            "duration_zero_used": False
+        }), 200
 
     except Exception as e:
         app.logger.error(f"Error updating session for user {current_user.id}: {e}")
@@ -331,7 +324,6 @@ def move_completed_sessions():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
-
 
 
 @app.route('/settings', methods=['GET', 'POST'])
