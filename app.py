@@ -379,7 +379,7 @@ def user_statistics():
     time_range = request.args.get('range')
 
     if time_range == 'day':
-        delta = timedelta(days=1)
+        delta = timedelta(hours=24)
     elif time_range == 'week':
         delta = timedelta(days=7)
     elif time_range == 'month':
@@ -417,7 +417,7 @@ def user_statistics():
     marathons_run = total_hours / 4  # Assuming 4 hours to run a marathon
     articles_read = total_hours / 1  # Assuming 1 hour to read an article
     blog_posts_written = total_hours / 2  # Assuming 2 hours to write a blog post
-    songs_listened = total_hours * 20  # Assuming 20 minutes to listen to a song
+    songs_listened = total_hours * 20  # Assuming 20 songs per hour
     podcasts_listened = total_hours / 1.5  # Assuming 1.5 hours to listen to a podcast
     naps_taken = total_hours / 0.5  # Assuming 0.5 hours to take a nap
 
@@ -480,19 +480,30 @@ def user_statistics():
 
 
 def generate_daily_line_chart(sessions):
-    labels = [time.strftime("%H:%M", time.localtime(session.start_time)) for session in sessions]
-    data = [session.duration / 60 for session in sessions]  # Convert duration to minutes
-
+    end_time = int(time.time())
+    start_time = end_time - 24 * 60 * 60  # 24 hours ago
+    
+    hourly_data = {hour: 0 for hour in range(24)}
+    
+    for session in sessions:
+        session_start_hour = (session.start_time - start_time) // 3600
+        if 0 <= session_start_hour < 24:
+            hourly_data[session_start_hour] += session.duration / 60  # Convert to minutes
+    
+    labels = [(datetime.fromtimestamp(start_time + i * 3600).strftime('%H:%M')) for i in range(24)]
+    data = [hourly_data[i] for i in range(24)]
+    
     return {
         'labels': labels,
         'datasets': [{
-            'label': 'Study Duration in Minutes',
+            'label': 'Minutes',
             'data': data,
+            'borderColor': 'rgba(30, 144, 255)',
             'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
+            'lineTension': 0.4
         }]
     }
+
 
 
 def generate_weekly_line_chart(sessions):
@@ -509,8 +520,8 @@ def generate_weekly_line_chart(sessions):
             'label': 'Study Duration per Day (hours)',
             'data': [sum(durations) for day, durations in daily_durations.items()],
             'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
+            'borderColor': 'rgb(30, 144, 255)',
+            'lineTension': 0.4
         }]
     }
 
@@ -529,8 +540,8 @@ def generate_monthly_line_chart(sessions):
             'label': 'Study Duration per Day (hours)',
             'data': [sum(durations) for day, durations in daily_durations.items()],
             'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
+            'borderColor': 'rgb(30, 144, 255)',
+            'lineTension': 0.4
         }]
     }
 
@@ -549,8 +560,8 @@ def generate_yearly_line_chart(sessions):
             'label': 'Study Duration per Month (hours)',
             'data': [sum(durations) for month, durations in monthly_durations.items()],
             'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
+            'borderColor': 'rgb(30, 144, 255)',
+            'lineTension': 0.4
         }]
     }
 
@@ -569,8 +580,8 @@ def generate_all_time_line_chart(sessions):
             'label': 'Total Study Duration per Year (hours)',
             'data': [sum(durations) for year, durations in yearly_durations.items()],
             'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
+            'borderColor': 'rgb(30, 144, 255)',
+            'lineTension': 0.4
         }]
     }
 

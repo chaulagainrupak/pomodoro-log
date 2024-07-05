@@ -33,7 +33,6 @@ function updateStats() {
 function createPieChart(chartData) {
     const ctx = document.getElementById('pieChart').getContext('2d');
     
-    // Destroy the existing chart if it exists
     if (pieChart) {
         pieChart.destroy();
     }
@@ -43,9 +42,13 @@ function createPieChart(chartData) {
         data: chartData,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: 'Time Distribution'
+            },
+            legend: {
+                position: 'bottom'
             }
         }
     });
@@ -54,7 +57,6 @@ function createPieChart(chartData) {
 function createLineChart(chartData, timeRange) {
     const ctx = document.getElementById('lineChart').getContext('2d');
 
-    // Destroy the existing chart if it exists
     if (lineChart) {
         lineChart.destroy();
     }
@@ -64,16 +66,20 @@ function createLineChart(chartData, timeRange) {
         data: chartData,
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: `Session Durations for ${timeRange} Minutes`
+            },
+            legend: {
+                position: 'bottom'
             },
             scales: {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true,
                         callback: function(value, index, values) {
-                            return value + 'm'; // Display minutes instead of hours
+                            return value + 'm';
                         }
                     }
                 }]
@@ -81,6 +87,21 @@ function createLineChart(chartData, timeRange) {
         }
     });
 }
+
+// Add this function to handle resizing
+function resizeCharts() {
+    if (pieChart) {
+        pieChart.resize();
+    }
+    if (lineChart) {
+        lineChart.resize();
+    }
+}
+
+// Add event listeners for resizing
+window.addEventListener('resize', resizeCharts);
+window.addEventListener('beforeprint', resizeCharts);
+window.addEventListener('afterprint', resizeCharts);
 
 
 
@@ -94,7 +115,7 @@ function displayFunStats(funStats, timeRange) {
         <h3>Fun Facts</h3>
         <p>In the past ${timeRange}, you:</p>
         <ul>
-            <li>- Studied for ${formatDuration(funStats.total_hours, 'hour')}</li>
+            <li>- Studied for ${formatDuration(funStats.total_hours, 'hour')} [In Minutes: ${formatDuration(funStats.total_minutes, 'minute')}, In Seconds: ${formatDuration(funStats.total_seconds, 'second')}]</li>
             <li>- Completed ${funStats.work_sessions} work sessions</li>
             <li>- Took ${funStats.short_breaks} short breaks and ${funStats.long_breaks} long breaks</li>
             <li>- Could have read ${funStats.books_read} books</li>

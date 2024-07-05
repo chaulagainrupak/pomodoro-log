@@ -105,10 +105,14 @@
                     </div>
                     
                     <div class="chart-container">
-                        <canvas id="pieChart"></canvas>
-                        <canvas id="lineChart"></canvas>
+                        <div class="chart-wrapper" style="position: relative; height:40vh; width:48%">
+                          <canvas id="pieChart"></canvas>
+                        </div>
+                        <div class="chart-wrapper" style="position: relative; height:40vh; width:48%">
+                          <canvas id="lineChart"></canvas>
+                        </div>
                         <p id="noPieDataMessage" style="display: none;">No data available for the selected time range.</p>
-                    </div>
+                      </div>
                         
                     
                     <div id="funStats" class="fun-stats"></div>
