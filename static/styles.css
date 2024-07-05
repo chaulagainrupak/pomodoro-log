@@ -196,7 +196,6 @@ body {
   padding: 25px;
   margin-bottom: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  max-width: 1000px; /* Increased max-width to accommodate side-by-side layout */
   margin: 0 auto;
 }
 
@@ -227,10 +226,6 @@ body {
   color: var(--text-dark);
 }
 
-.chart-container {
-  max-width: 500px;
-  margin: 0 auto 30px;
-}
 
 #noDataMessage {
   text-align: center;
@@ -238,37 +233,33 @@ body {
   font-style: italic;
 }
 
-.stats-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
-}
 
 .chart-container {
-  flex: 1;
-  max-width: 48%; /* Adjust as needed */
-  margin-right: 2%;
-}
-
-.stats-container {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
+  height: 30rem;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+
 }
 
-.chart-container {
-  flex: 1;
-  max-width: 48%; /* Adjust as needed */
-  margin-right: 2%;
+@media (max-width: 1820px){
+  .chart-container {
+    display: flex;
+    height: 30rem;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-top: 20rem;
+    margin-bottom: 20rem;
+  }
 }
 
 .fun-stats {
   flex: 1;
-  max-width: 48%; /* Adjust as needed */
   background-color: var(--sidebar-bg);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
 }
 
 .fun-stats h3 {

@@ -394,31 +394,20 @@ def user_statistics():
     user_id = current_user.id
 
     if time_range == 'all_time':
-        sessions = CompletedSession.query.filter_by(user_id=user_id)\
-            .filter(CompletedSession.duration >= 0).all()
+        sessions = CompletedSession.query.filter((CompletedSession.user_id == user_id) & (CompletedSession.duration >= 0)).all()
+    elif time_range == 'year':
+        start_date = int(time.time()) - delta.total_seconds()
+        sessions = CompletedSession.query.filter((CompletedSession.user_id == user_id) & (CompletedSession.start_time >= start_date) & (CompletedSession.duration >= 0)).all()
     else:
-        sessions = CompletedSession.query.filter_by(user_id=user_id)\
-            .filter(func.date(CompletedSession.date) >= datetime.today() - delta)\
-            .filter(CompletedSession.duration >= 0).all()
+        start_date = int(time.time()) - delta.total_seconds()
+        end_date = int(time.time())
+        sessions = CompletedSession.query.filter((CompletedSession.user_id == user_id) & (CompletedSession.start_time >= start_date) & (CompletedSession.start_time <= end_date) & (CompletedSession.duration >= 0)).all()
 
-    # Initialize variables to store the total duration and counts
-    total_duration = 0
-    work_sessions = 0
-    short_breaks = 0
-    long_breaks = 0
+    total_duration = sum(session.duration for session in sessions if session.duration >= 0)
+    work_sessions = sum(1 for session in sessions if session.phase == 'Pomodoro')
+    short_breaks = sum(1 for session in sessions if session.phase == 'Short Break')
+    long_breaks = sum(1 for session in sessions if session.phase == 'Long Break')
 
-    # Iterate over the sessions to calculate the total duration and counts
-    for session in sessions:
-        total_duration += session.duration
-
-        if session.phase == 'Pomodoro':
-            work_sessions += 1
-        elif session.phase == 'Short Break':
-            short_breaks += 1
-        elif session.phase == 'Long Break':
-            long_breaks += 1
-
-    # Calculate the fun stats
     total_hours = total_duration / 3600
     total_minutes = total_duration / 60
     total_seconds = total_duration
@@ -439,12 +428,12 @@ def user_statistics():
             'label': 'Time Distribution',
             'data': [work_sessions, short_breaks, long_breaks],
             'backgroundColor': [
-                'rgba(238, 57, 64, 0.4)',  
+                'rgba(238, 57, 64, 0.4)',  # var(--primary-red) with opacity
                 'rgba(30, 144, 255, 0.2)',  # var(--accent-blue) with opacity
                 'rgba(0, 128, 0, 0.2)',  # var(--secondary-green) with opacity
             ],
             'borderColor': [
-                'rgba(238, 57, 64, 0.4)',  # var(--primary-green)
+                'rgba(238, 57, 64, 0.4)',  # var(--primary-red)
                 'rgba(30, 144, 255, 1)',  # var(--accent-blue)
                 'rgba(0, 128, 0, 1)',  # var(--secondary-green)
             ],
@@ -452,17 +441,18 @@ def user_statistics():
         }]
     }
 
-    # Prepare data for line chart (session durations over time)
-    line_chart_data = {
-        'labels': [session.date.strftime('%Y-%m-%d') for session in sessions],
-        'datasets': [{
-            'label': 'Session Durations',
-            'data': [session.duration for session in sessions],
-            'fill': False,
-            'borderColor': 'rgb(75, 192, 192)',
-            'lineTension': 0.1
-        }]
-    }
+    line_chart_data = {}
+
+    if time_range == 'day':
+        line_chart_data = generate_daily_line_chart(sessions)
+    elif time_range == 'week':
+        line_chart_data = generate_weekly_line_chart(sessions)
+    elif time_range == 'month':
+        line_chart_data = generate_monthly_line_chart(sessions)
+    elif time_range == 'year':
+        line_chart_data = generate_yearly_line_chart(sessions)
+    elif time_range == 'all_time':
+        line_chart_data = generate_all_time_line_chart(sessions)
 
     fun_stats = {
         'total_hours': round(total_hours, 2),
@@ -487,6 +477,104 @@ def user_statistics():
         'fun_stats': fun_stats,
         'time_range': time_range
     })
+
+
+def generate_daily_line_chart(sessions):
+    labels = [time.strftime("%H:%M", time.localtime(session.start_time)) for session in sessions]
+    data = [session.duration / 60 for session in sessions]  # Convert duration to minutes
+
+    return {
+        'labels': labels,
+        'datasets': [{
+            'label': 'Study Duration in Minutes',
+            'data': data,
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+
+def generate_weekly_line_chart(sessions):
+    daily_durations = {}
+    for session in sessions:
+        day_of_week = time.strftime("%A", time.localtime(session.start_time))
+        if day_of_week not in daily_durations:
+            daily_durations[day_of_week] = []
+        daily_durations[day_of_week].append(session.duration / 3600)  # Convert duration to hours
+
+    return {
+        'labels': list(daily_durations.keys()),
+        'datasets': [{
+            'label': 'Study Duration per Day (hours)',
+            'data': [sum(durations) for day, durations in daily_durations.items()],
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+
+def generate_monthly_line_chart(sessions):
+    daily_durations = {}
+    for session in sessions:
+        day_of_month = time.strftime("%d", time.localtime(session.start_time))
+        if day_of_month not in daily_durations:
+            daily_durations[day_of_month] = []
+        daily_durations[day_of_month].append(session.duration / 3600)  # Convert duration to hours
+
+    return {
+        'labels': list(daily_durations.keys()),
+        'datasets': [{
+            'label': 'Study Duration per Day (hours)',
+            'data': [sum(durations) for day, durations in daily_durations.items()],
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+
+def generate_yearly_line_chart(sessions):
+    monthly_durations = {}
+    for session in sessions:
+        month = time.strftime("%b", time.localtime(session.start_time))
+        if month not in monthly_durations:
+            monthly_durations[month] = []
+        monthly_durations[month].append(session.duration / 3600)  # Convert duration to hours
+
+    return {
+        'labels': list(monthly_durations.keys()),
+        'datasets': [{
+            'label': 'Study Duration per Month (hours)',
+            'data': [sum(durations) for month, durations in monthly_durations.items()],
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+
+def generate_all_time_line_chart(sessions):
+    yearly_durations = {}
+    for session in sessions:
+        year = time.strftime("%Y", time.localtime(session.start_time))
+        if year not in yearly_durations:
+            yearly_durations[year] = []
+        yearly_durations[year].append(session.duration / 3600)  # Convert duration to hours
+
+    return {
+        'labels': list(yearly_durations.keys()),
+        'datasets': [{
+            'label': 'Total Study Duration per Year (hours)',
+            'data': [sum(durations) for year, durations in yearly_durations.items()],
+            'fill': False,
+            'borderColor': 'rgb(75, 192, 192)',
+            'lineTension': 0.1
+        }]
+    }
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404 

@@ -53,39 +53,27 @@ function createPieChart(chartData) {
 
 function createLineChart(chartData, timeRange) {
     const ctx = document.getElementById('lineChart').getContext('2d');
-    
+
     // Destroy the existing chart if it exists
     if (lineChart) {
         lineChart.destroy();
     }
 
-    // Prepare data for line chart
-    const formattedData = {
-        labels: chartData.labels,
-        datasets: [{
-            label: 'Session Durations (hours)',
-            data: chartData.datasets[0].data.map(duration => duration / 3600), // Convert seconds to hours
-            fill: false,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            lineTension: 0.1
-        }]
-    };
-
     lineChart = new Chart(ctx, {
         type: 'line',
-        data: formattedData,
+        data: chartData,
         options: {
             responsive: true,
             title: {
                 display: true,
-                text: `Session Durations for ${timeRange}`
+                text: `Session Durations for ${timeRange} Minutes`
             },
             scales: {
                 yAxes: [{
                     ticks: {
                         beginAtZero: true,
                         callback: function(value, index, values) {
-                            return value + 'h';
+                            return value + 'm'; // Display minutes instead of hours
                         }
                     }
                 }]
@@ -93,6 +81,8 @@ function createLineChart(chartData, timeRange) {
         }
     });
 }
+
+
 
 function displayFunStats(funStats, timeRange) {
     const funStatsDiv = document.getElementById('funStats');
