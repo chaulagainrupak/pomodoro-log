@@ -13,6 +13,18 @@ You can try it out on [my site](https://pomodoro.chaulagainrupak.com.np/).
 - Pomodoro Session Tracking
 - Dynamic Charts for Productivity Analysis (Daily, Weekly, Monthly, Yearly, All-time)
 
+## Planned Features
+
+- To-Do List
+- Notes
+- Flash Cards
+- Friend System
+- Leaderboards with Friends
+- Calendar Integration (Probably not)
+- Mobile App Version (This is just better better responsive design for mobile browser)
+- Dark Mode (In development)
+- Detailed Session Reports and Analytics
+
 ## Technologies Used
 
 - **Backend**: Flask, SQLAlchemy, Flask-Login
