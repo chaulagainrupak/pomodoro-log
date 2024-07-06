@@ -126,6 +126,9 @@ function displayFunStats(funStats, timeRange) {
             <li>- Could have listened to ${funStats.songs_listened} songs</li>
             <li>- Could have listened to ${funStats.podcasts_listened} podcasts</li>
             <li>- Could have taken ${funStats.naps_taken} naps</li>
+            <li>- Could have drunk ${funStats.cups_of_coffee} cups of coffee</li>
+            <li>- Could have walked ${funStats.miles_walked} miles</li>
+            <li>- Could have taken ${funStats.steps_taken} steps</li>   
         </ul>
     `;
 }
