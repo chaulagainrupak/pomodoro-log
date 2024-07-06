@@ -397,7 +397,7 @@ body {
   font-size: 0.6rem;
 }
 
-@media (max-width: 830px) {
+@media (max-width: 300px) {
   body {
     padding-left: 0;
     padding-bottom: 60px; /* Add padding for the bottom nav */
@@ -445,7 +445,7 @@ body {
     display: flex;
     flex-direction: column !important;
     justify-content: space-evenly;
-  }
+  }o
   
   .timerModes > div.selected{
     border-radius: 20px;;
