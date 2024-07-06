@@ -21,7 +21,6 @@ import re
 from appRoutes.stats import *
 from appRoutes.settings import *
 from appRoutes.moveCompletedSessions import *
-from appRoutes.updateSession import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super secret key man!'
