@@ -7,6 +7,7 @@
     <title>Pomodoro-Log</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <style>
         body{
@@ -126,6 +127,19 @@
             </div>
         </div>
     </div>
+
+    <div class="bottom-nav">
+        <a href="#pomodoro"><i class="fas fa-clock"></i>Pomodoro</a>
+        <a href="#statistics"><i class="fas fa-chart-bar"></i>Stats</a>
+        <a href="#todo"><i class="fas fa-list"></i>Todo</a>
+        <a href="#notes"><i class="fas fa-sticky-note"></i>Notes</a>
+        <a href="#flashcards"><i class="fas fa-layer-group"></i>Cards</a>
+        {% if current_user.role == 'admin' %}
+          <a href="/adminDashboard"><i class="fas fa-user-cog"></i>Admin</a>
+        {% endif %}
+        <a href="/settings"><i class="fas fa-cog"></i>Settings</a>
+      </div>
+  
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
     <script src="{{ url_for('static', filename='pomodoro.js') }}"></script>
     <script src="{{ url_for('static', filename='stats.js') }}"></script>

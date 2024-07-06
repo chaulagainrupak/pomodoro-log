@@ -355,3 +355,108 @@ body {
   border: none;
   cursor: pointer;
 }
+
+.bottom-nav{
+  display: none;
+}
+
+/* ... (previous CSS remains unchanged) ... */
+
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--sidebar-bg);
+  padding: 5px;
+  justify-content: space-around;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-nav a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-size: 0.7rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 0;
+  width: 100%;
+}
+
+.bottom-nav a i {
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+}
+
+.bottom-nav a span {
+  display: block;
+  font-size: 0.6rem;
+}
+
+@media (max-width: 830px) {
+  body {
+    padding-left: 0;
+    padding-bottom: 60px; /* Add padding for the bottom nav */
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+  }
+
+  .sections {
+    display: block;
+    margin-left: 0 !important;
+    width: 100%; /* Changed from 830px to 100% for better responsiveness */
+  }
+
+  .content {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .section {
+    border-radius: 0;
+    margin-bottom: 20px;
+  }
+
+  /* Adjust chart container for small screens */
+  .chart-container {
+    flex-direction: column;
+  }
+
+  .chart-wrapper {
+    width: 100% !important;
+    height: 40vh !important;
+    margin-bottom: 20px;
+  }
+
+  .timerModes {
+    margin-top: 1rem;
+    font-size: 2rem;
+    display: flex;
+    justify-content: space-evenly;
+  }
+  
+  .timerModes > div.selected{
+    border-radius: 20px;;
+    background-color: var(--primary-green);
+    color: var(--text-light);
+    padding: 20px !important;
+  }
+  
+  .timerModes > div{
+    border-radius: 20px;
+    border: var(--primary-green) 2px solid;
+    padding: 20px !important;
+    cursor: pointer;
+  }
+}
