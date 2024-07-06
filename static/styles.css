@@ -326,6 +326,10 @@ body {
   z-index: 10;
 }
 
+.time:hover{
+  cursor: url('pencilCursor.png'), auto;
+}
+
 @media (max-width: 768px) {
   .stats-container {
       flex-direction: column;
