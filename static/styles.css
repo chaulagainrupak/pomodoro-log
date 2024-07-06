@@ -443,7 +443,7 @@ body {
     margin-top: 1rem;
     font-size: x-large !important;
     display: flex;
-    flex-direction: column;
+    flex-direction: column !important;
     justify-content: space-evenly;
   }
   
@@ -459,5 +459,6 @@ body {
     border: var(--primary-green) 2px solid;
     padding: 20px !important;
     cursor: pointer;
+    font-size: medium !important;
   }
 }
