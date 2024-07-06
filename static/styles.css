@@ -441,8 +441,9 @@ body {
 
   .timerModes {
     margin-top: 1rem;
-    font-size: 2rem !important;
+    font-size: x-large !important;
     display: flex;
+    flex-direction: column;
     justify-content: space-evenly;
   }
   
