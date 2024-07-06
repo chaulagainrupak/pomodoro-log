@@ -115,30 +115,31 @@ function displayFunStats(funStats, timeRange) {
         <h3>Fun Facts</h3>
         <p>In the past ${timeRange}, you:</p>
         <ul>
-            <li>- Studied for ${formatDuration(funStats.total_hours, 'hour')} [In Minutes: ${formatDuration(funStats.total_minutes, 'minute')}, In Seconds: ${formatDuration(funStats.total_seconds, 'second')}]</li>
-            <li>- Completed ${funStats.work_sessions} work sessions</li>
-            <li>- Took ${funStats.short_breaks} short breaks and ${funStats.long_breaks} long breaks</li>
-            <li>- Could have read ${funStats.books_read} books</li>
-            <li>- Could have watched ${funStats.movies_watched} movies</li>
-            <li>- Could have run ${funStats.marathons_run} marathons</li>
-            <li>- Could have read ${funStats.articles_read} articles</li>
-            <li>- Could have written ${funStats.blog_posts_written} blog posts</li>
-            <li>- Could have listened to ${funStats.songs_listened} songs</li>
-            <li>- Could have listened to ${funStats.podcasts_listened} podcasts</li>
-            <li>- Could have taken ${funStats.naps_taken} naps</li>
-            <li>- Could have drunk ${funStats.cups_of_coffee} cups of coffee</li>
-            <li>- Could have walked ${funStats.miles_walked} miles</li>
-            <li>- Could have taken ${funStats.steps_taken} steps</li>   
+            <li>- Studied for ${formatDuration(funStats.total_hours)} [In Minutes: ${formatDuration(funStats.total_minutes)} minutes, In Seconds: ${formatDuration(funStats.total_seconds)} seconds]</li>
+            <li>- Completed ${formatDuration(funStats.work_sessions)} work sessions</li>
+            <li>- Took ${formatDuration(funStats.short_breaks)} short and ${formatDuration(funStats.long_breaks)} long breaks</li>
+            <li>- Could have read ${formatDuration(funStats.books_read)} books</li>
+            <li>- Could have watched ${formatDuration(funStats.movies_watched)} movies</li>
+            <li>- Could have run ${formatDuration(funStats.marathons_run)} marathons</li>
+            <li>- Could have read ${formatDuration(funStats.articles_read)} articles</li>
+            <li>- Could have written ${formatDuration(funStats.blog_posts_written)} blog posts</li>
+            <li>- Could have listened to ${formatDuration(funStats.songs_listened)} songs</li>
+            <li>- Could have listened to ${formatDuration(funStats.podcasts_listened)} podcasts</li>
+            <li>- Could have taken ${formatDuration(funStats.naps_taken)} naps</li>
+            <li>- Could have drunk ${formatDuration(funStats.cups_of_coffee)} cups of coffee</li>
+            <li>- Could have walked ${formatDuration(funStats.miles_walked)} miles</li>
+            <li>- Could have taken ${formatDuration(funStats.steps_taken)} steps</li>   
         </ul>
     `;
 }
 
-function formatDuration(value, unit) {
+function formatDuration(value) {
     if (value < 1000) {
-        return value.toFixed(2) + ' ' + unit + (value === 1 ? '' : 's');
+        return value.toFixed(2);
     } else if (value < 1000000) {
-        return (value / 1000).toFixed(2) + 'K ' + unit + (value / 1000 === 1 ? '' : 's');
+        return (value / 1000).toFixed(2) + 'K';
     } else {
-        return (value / 1000000).toFixed(2) + 'M ' + unit + (value / 1000000 === 1 ? '' : 's');
+        return (value / 1000000).toFixed(2) + 'M';
     }
 }
+

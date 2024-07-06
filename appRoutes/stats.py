@@ -76,6 +76,7 @@ def userStatistics():
 
     if time_range == 'day':
         line_chart_data = generateDailyLineChart(sessions)
+        print(line_chart_data)
     elif time_range == 'week':
         line_chart_data = generateWeeklyLineChart(sessions)
     elif time_range == 'month':
@@ -95,8 +96,14 @@ def userStatistics():
     })
 
 def generateDailyLineChart(sessions):
-    end_time = int(time.time())
-    start_time = end_time - 24 * 60 * 60  # 24 hours ago
+    # Find the latest session start time in seconds since epoch
+    if sessions:
+        start_time = max(session.start_time for session in sessions)
+    else:
+        # Default to 24 hours ago if no sessions found
+        start_time = int(time.time()) - 24 * 60 * 60
+    
+    end_time = start_time + 24 * 60 * 60  # 24 hours after the start time
     hourly_data = {phase: [0] * 24 for phase in ['Pomodoro', 'Short Break', 'Long Break']}
     
     for session in sessions:
@@ -116,14 +123,14 @@ def generateDailyLineChart(sessions):
     for phase in hourly_data:
         datasets.append({
             'label': phase,
-            'data': [round(val, 2) for val in hourly_data[phase]],  # Round to 2 decimal places
+            'data': [round(val, 2) for val in hourly_data[phase][::-1]],  # Reverse to oldest to latest
             'borderColor': colors[phase],
             'fill': False,
             'lineTension': 0.4
         })
 
     return {
-        'labels': labels,
+        'labels': labels[::-1],  # Reverse to oldest to latest
         'datasets': datasets
     }
 
@@ -239,7 +246,6 @@ def generateAllTimeLineChart(sessions):
             'fill': False,
             'lineTension': 0.4
         })
-
     return {
         'labels': list(yearly_durations['Pomodoro'].keys()),
         'datasets': datasets
