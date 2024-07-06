@@ -113,7 +113,7 @@ def userStatistics():
     })
 
 
-def generateDailyLineCha(sessions):
+def generateDailyLineChart(sessions):
     end_time = int(time.time())
     start_time = end_time - 24 * 60 * 60  # 24 hours ago
     
