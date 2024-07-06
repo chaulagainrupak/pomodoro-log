@@ -76,7 +76,6 @@ def userStatistics():
 
     if time_range == 'day':
         line_chart_data = generateDailyLineChart(sessions)
-        print(line_chart_data)
     elif time_range == 'week':
         line_chart_data = generateWeeklyLineChart(sessions)
     elif time_range == 'month':
