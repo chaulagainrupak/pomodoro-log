@@ -182,6 +182,8 @@ function displayTimeLeft(seconds, timeDisplayId) {
   const display = `${minutes}:${remainderSeconds < 10 ? '0' : ''}${remainderSeconds}`;
   document.getElementById(timeDisplayId).textContent = display;
 
+  document.querySelector('title').textContent = `Pomodoro-Log ${display}`;
+
   const currentMode = getCurrentMode();
   let totalSeconds;
   switch (currentMode) {
