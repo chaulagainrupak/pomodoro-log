@@ -1,0 +1,69 @@
+{% extends 'base.html'%}
+
+{% block title %}
+    Submit
+{% endblock %}
+
+{% block body %}
+<h1>Submit a Question</h1>
+<form id="questionForm" action="/submitQuestion" method="post" enctype="multipart/form-data">
+    
+    <p style="display: none;" id="config"> {{ config | tojson | safe }}</p>
+    <div>
+        <label for="board">Board:</label>
+        <select name="board" id="board" required>
+            <option value="NEB" selected>NEB</option>
+        </select>
+    </div>
+    <div>
+        <label for="subject">Subject:</label>
+        <select id="subject" name="subject" required>
+            {% for subject in config.NEB.subjects%}
+                <option value="{{subject.name}}" id="subject">{{subject.name}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div>
+        <label for="topic">Topic:</label>
+        <select id="topic" name="topic" required>   
+        </select>
+    </div>
+    <div>
+        <label for="difficulty">Difficulty (1-5):</label>
+        <input type="number" id="difficulty" name="difficulty" min="1" max="5" required>
+    </div>
+    <div>
+        <label for="level">Level:</label>
+        <select id="level" name="level" required>
+
+            {% for level in config.NEB.levels%}
+                <option value="{{level}}">{{level}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div>
+        <label for="component">Component:</label>
+        <select id="component" name="component" required>
+            <option value="choose">Choose One</option>
+
+            {% for component in config.NEB.components%}
+                <option value="{{component}}">{{component}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div>
+        <label for="file">Question Image:</label>
+            <input type="file" id="questionFile" name="questionFile" accept="image/*" required>
+    </div>
+
+    <div>
+        <label for="file">Solution Image:</label>
+
+        <input type="file" name="solutionFile" id="solutionFile" accept="image/*" required>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}
