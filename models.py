@@ -1,21 +1,54 @@
-
-
-# models.py
-
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(30), nullable=False, unique=True)
+    email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    signup_time = db.Column(db.DateTime, default=datetime.utcnow)
-    full_name = db.Column(db.String(150))
-    role = db.Column(db.String(50), default='user')
+    activate = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
+    signup_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    last_login_time = db.Column(db.DateTime)
 
+    def update_last_login_time(self):
+        self.last_login_time = datetime.utcnow()
+        db.session.commit()
+
+
+class UsersPreferences(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    theme = db.Column(db.String(50), default='light')
+    pomodoro_duration = db.Column(db.Integer, default=25)  # Pomodoro duration in minutes
+    short_break_duration = db.Column(db.Integer, default=5)  # Short break duration in minutes
+    long_break_duration = db.Column(db.Integer, default=15)  # Long break duration in minutes
     
+    user = db.relationship('User', backref=db.backref('preferences', lazy=True))
+
+
+class CurrentSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.Integer, nullable=False)
+    end_time = db.Column(db.Integer, nullable=True)
+    phase = db.Column(db.String(20), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('pomodoro_sessions', lazy=True))
+
+class CompletedSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.Integer, nullable=False)
+    end_time = db.Column(db.Integer, nullable=False)
+    phase = db.Column(db.String(20), nullable=False)
+    duration = db.Column(db.Integer, nullable=False)  # Duration in seconds
+    date = db.Column(db.DateTime, nullable=False)  # Date of the session
+    completed = db.Column(db.Boolean, nullable=False, default=True)
+    notes = db.Column(db.Text)  # Optional field for user notes
+    tags = db.Column(db.String(255))  # Optional field for tagging sessions
+
+    user = db.relationship('User')
